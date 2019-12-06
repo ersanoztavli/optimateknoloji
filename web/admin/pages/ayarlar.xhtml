@@ -1,0 +1,156 @@
+<ui:composition template="templateAdmin.xhtml"
+     xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:f="http://java.sun.com/jsf/core"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:p="http://primefaces.org/ui">    
+    <ui:define name="content">
+            <p:breadCrumb>
+                <p:menuitem value="Ana Sayfa" url="/admin/pages/welcomeAdmin.jsf" />
+                <p:menuitem value="Ayarlar" url="/admin/pages/ayarlar.jsf" />
+            </p:breadCrumb>
+            <p:tabView style="height: auto;">
+                <p:tab title="ERP Veri Tabanı">
+                    <h:form id="ERPVTForm">
+                        <p:growl id="growl" showDetail="false" sticky="false" escape="false"/> 
+                        <h:panelGrid columns="3" cellpadding="5" style="font-size: 14px">
+                                <h:outputLabel for="ERPVTSunucuAdi" value="ERP Veri Tabanı Sunucu Adı:" /> 
+                                <p:inputText id="ERPVTSunucuAdi" value="#{ayarlarBean.ERPVeriTabaniAyar.SUNUCU_ADI}" 
+                                             style="width:300px" required="true" requiredMessage="Lütfen ERP veri tabanı sunucu adını giriniz!"
+                                             placeholder="ERP V.T. Sunucu Adı"/>
+                                <p:message for="ERPVTSunucuAdi" />
+                                
+                                <h:outputLabel for="ERPVTSunucuPortNumarasi" value="ERP Veri Tabanı Sunucusu Port Numarası:" /> 
+                                <p:inputText id="ERPVTSunucuPortNumarasi" value="#{ayarlarBean.ERPVeriTabaniAyar.SUNUCU_PORT_NUMARASI}" 
+                                             style="width:300px" required="true" requiredMessage="Lütfen ERP veri tabanı sunucusu port numarasını giriniz!"
+                                             placeholder="ERP V.T. Sunucusu Port No."/>
+                                <p:message for="ERPVTSunucuPortNumarasi" />
+                                
+                                <h:outputLabel for="ERPVTAdi" value="ERP Veri Tabanı Adı:" /> 
+                                <p:inputText id="ERPVTAdi" value="#{ayarlarBean.ERPVeriTabaniAyar.VERI_TABANI_ADI}" 
+                                             style="width:300px" required="true" requiredMessage="Lütfen ERP veri tabanı adını giriniz!"
+                                             placeholder="ERP V.T. Adı"/>
+                                <p:message for="ERPVTAdi" />
+                                
+                                <h:outputLabel for="ERPVTKullaniciAdi" value="ERP Veri Tabanı Kullanıcı Adı:" /> 
+                                <p:inputText id="ERPVTKullaniciAdi" value="#{ayarlarBean.ERPVeriTabaniAyar.KULLANICI_ADI}" 
+                                             style="width:300px" required="true" requiredMessage="Lütfen ERP veri tabanı kullanıcı adını giriniz!"
+                                             placeholder="ERP V.T. Kullanıcı Adı"/>
+                                <p:message for="ERPVTKullaniciAdi" />
+                                
+                                <h:outputLabel for="ERPVTKullaniciSifresi" value="ERP Veri Tabanı Kullanıcı Şifresi:" /> 
+                                <p:password id="ERPVTKullaniciSifresi" value="#{ayarlarBean.ERPVeriTabaniAyar.KULLANICI_SIFRE}" 
+                                             style="width:300px" required="true" redisplay="true"
+                                             requiredMessage="Lütfen ERP veri tabanı kullanıcı şifresini giriniz!"
+                                             placeholder="ERP V.T. Kullanıcı Şifresi"/>
+                                <p:message for="ERPVTKullaniciSifresi" />
+                                
+                                <f:facet name="footer">
+                                    <p:commandButton value="Test Et" action="#{ayarlarBean.baglantiTestEtERP()}"
+                                                     update="@form" icon="fa fa-cog"/>
+                                    <p:commandButton value="Kaydet" action="#{ayarlarBean.kaydetBaglantiERP()}"
+                                                     update="@form" style="margin-left: 20px" icon="fa fa-floppy-o"/>
+                                </f:facet> 
+                        </h:panelGrid>
+                    </h:form>
+                </p:tab>
+                <p:tab title="Mail">
+                   <h:form id="mailForm">
+                       <p:growl id="growl2" showDetail="false" sticky="false" escape="false"/> 
+                        <h:panelGrid columns="3" cellpadding="5" style="font-size: 14px">
+                                <h:outputLabel for="EmailSunucuAdi" value="E-mail Sunucu Adı:" /> 
+                                <p:inputText id="EmailSunucuAdi" value="#{ayarlarBean.emailAyar.EMAIL_SUNUCU_ADI}" 
+                                             style="width:300px" required="true" requiredMessage="Lütfen e-mail sunucu adını giriniz!"
+                                             placeholder="E-mail Sunucu Adı"/>
+                                <p:message for="EmailSunucuAdi" />
+                                
+                                <h:outputLabel for="EmailSunucuPortNumarasi" value="E-mail Sunucusu Port Numarası:" /> 
+                                <p:inputText id="EmailSunucuPortNumarasi" value="#{ayarlarBean.emailAyar.EMAIL_SUNUCU_PORT_NUMARASI}" 
+                                             style="width:300px" required="true" requiredMessage="Lütfen e-mail sunucusu port numarasını giriniz!"
+                                             placeholder="E-mail Sunucusu Port No."/>
+                                <p:message for="EmailSunucuPortNumarasi" />
+                                
+                                <h:outputLabel for="EmailAdresi" value="E-mail Adresi:" /> 
+                                <p:inputText id="EmailAdresi" value="#{ayarlarBean.emailAyar.EMAIL_ADRES}" 
+                                             style="width:300px" required="true" requiredMessage="Lütfen e-mail adresini giriniz!"
+                                             placeholder="E-mail Adresi"/>
+                                <p:message for="EmailAdresi" />
+                                
+                                <h:outputLabel for="EmailSifresi" value="E-mail Şifresi:" /> 
+                                <p:password id="EmailSifresi" value="#{ayarlarBean.emailAyar.EMAIL_SIFRE}" 
+                                             style="width:300px" required="true" requiredMessage="Lütfen e-mail şifresi giriniz!"
+                                             redisplay="true" placeholder="E-mail Şifresi"/>
+                                <p:message for="EmailSifresi" />
+                                
+                                <f:facet name="footer">
+                                    <p:commandButton value="Test E-mail'i gönder" action="#{ayarlarBean.gonderTestEmail()}"
+                                        update="@form" icon="fa fa-send"/>
+                                    <p:commandButton value="Kaydet" action="#{ayarlarBean.kaydetEmailAyar()}"
+                                        update="@form" style="margin-left: 20px" icon="fa fa-floppy-o"/>
+                                </f:facet> 
+                        </h:panelGrid>                        
+                   </h:form>
+                </p:tab>
+                <p:tab title="Rest Servis">
+                    <h:form id="restServisForm">
+                        <p:growl id="growl2" showDetail="false" sticky="false" escape="false"/>     
+                         <h:panelGrid columns="3" cellpadding="5" style="font-size: 14px">
+                             <h:outputLabel for="clientId" value="Rest Servis Client Id:" /> 
+                             <p:inputText id="clientId" value="#{ayarlarBean.restServisAyar.REST_SERVIS_CLIENT_ID}" 
+                                          style="width:500px" required="true" requiredMessage="Lütfen client Id giriniz!"
+                                          placeholder="Rest Servis Client Id"/>
+                             <p:message for="clientId" />
+                             
+                             <h:outputLabel for="clientSecret" value="Rest Servis Client Secret:" /> 
+                             <p:password id="clientSecret" value="#{ayarlarBean.restServisAyar.REST_SERVIS_CLIENT_SECRET}" 
+                                          style="width:500px" required="true" requiredMessage="Lütfen client secret giriniz!"
+                                          placeholder="Rest Servis Client Secret" redisplay="true"/>
+                             <p:message for="clientSecret" />
+                             
+                             <h:outputLabel for="servisSunucuAdiIp" value="Rest Servis Sunucu Adı/Ip:" /> 
+                             <p:inputText id="servisSunucuAdiIp" value="#{ayarlarBean.restServisAyar.REST_SERVIS_SUNUCU_ADI_IP}" 
+                                          style="width:500px" required="true" requiredMessage="Lütfen sunucu adı/Ip giriniz!"
+                                          placeholder="Rest Servis Sunucu Adı/Ip"/>
+                             <p:message for="servisSunucuAdiIp" />
+                             
+                             <h:outputLabel for="servisSunucuPort" value="Rest Servis Sunucu Port:" /> 
+                             <p:inputText id="servisSunucuPort" value="#{ayarlarBean.restServisAyar.REST_SERVIS_SUNUCU_PORT}" 
+                                          style="width:500px" required="true" requiredMessage="Lütfen sunucu port giriniz!"
+                                          placeholder="Rest Servis Sunucu Port"/>
+                             <p:message for="servisSunucuPort" />
+                             
+                             <h:outputLabel for="servisKullaniciAdi" value="Rest Servis Kullanıcı Adı:" /> 
+                             <p:inputText id="servisKullaniciAdi" value="#{ayarlarBean.restServisAyar.REST_SERVIS_USERNAME}" 
+                                          style="width:500px" required="true" requiredMessage="Lütfen kullanıcı adı giriniz!"
+                                          placeholder="Rest Servis Kullanıcı Adı"/>
+                             <p:message for="servisKullaniciAdi" />
+                             
+                             <h:outputLabel for="servisSifre" value="Rest Servis Şifre:" /> 
+                             <p:password id="servisSifre" value="#{ayarlarBean.restServisAyar.REST_SERVIS_PASSWORD}" 
+                                          style="width:500px" placeholder="Rest Servis Şifre" redisplay="true"/>
+                             <p:message for="servisSifre" />
+                             
+                             <h:outputLabel for="servisFirmaNo" value="Rest Servis Firma No.:" /> 
+                             <p:inputText id="servisFirmaNo" value="#{ayarlarBean.restServisAyar.REST_SERVIS_FIRMNO}" 
+                                          style="width:500px" required="true" requiredMessage="Lütfen firma no. giriniz!"
+                                          placeholder="Rest Servis Firma No."/>
+                             <p:message for="servisFirmaNo" />
+                             
+                             <f:facet name="footer">
+                                 <p:commandButton value="Test Et" action="#{ayarlarBean.restServisTestEt()}"
+                                                 update="@form" icon="fa fa-cog"/>
+                                <p:commandButton value="Kaydet" action="#{ayarlarBean.kaydetRestServisAyar()}"
+                                                 update="@form" style="margin-left: 20px" icon="fa fa-floppy-o"/>
+                             </f:facet> 
+                         </h:panelGrid>
+                    </h:form>
+                </p:tab>
+                <p:tab title="SMS">
+                </p:tab>
+                <p:tab title="WhatsApp">
+                </p:tab>
+                <p:tab title="Fax">
+                </p:tab>
+            </p:tabView>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,88 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <link rel="shortcut icon" type="image/x-icon" href="#{request.contextPath}/resources/images/oms.ico"/>
+    <h:head>
+        <title>OMS - Yönetici Girişi</title>
+    </h:head>
+    <p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />
+    <p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+       <img src="../resources/images/ajaxloadingbar.gif" alt=""/>
+    </p:dialog>
+    <h:body> 
+<!--        <img src="../resources/images/resim.png" alt="" 
+             style="background-size: cover;
+                    background-repeat: no-repeat;
+                    background-attachment:fixed;
+                    position: fixed;
+                    right: 0;
+                    bottom: 0;" />-->
+<!--        <video id="myVideo" 
+               style="width: 100%; padding: 0; position: fixed; bottom: 0; margin-left: -8px" autoplay="" loop="" muted="">
+            <source src="../resources/images/video.mp4" type="video/mp4"/>
+        </video>-->        
+        <div style="width:370px; height: 500px; position:absolute; 
+                    left:0; right:0; top:0; bottom:0; 
+                    margin:auto; max-width:100%;
+                    max-height:100%; overflow:auto;">
+            <center>
+                <div style="width:340px; height: 150px; ">
+                    <img src="../resources/images/optimaBuyuk.jpeg" alt="" style="width:320px;height: 150px;margin-right:10px;"/>
+                </div>
+            </center>
+            <h:form style="text-align: center;" > 
+                <p:growl id="growl" showDetail="false" sticky="true" escape="false"/> 
+                <p:panel header="OMS - Teklif Yönetim Yazılımı" style="width:343px; height:250px;" >
+                    <h:panelGrid style="align-content: center">                        
+                        <h:outputText value="Kullanıcı Adı" style="text-align: center;"/>                        
+                        <p:inputText id="username" value="#{sessionBean.kullanici.KULLANICI_ADI}" style="width:290px;" 
+                                     required="true" requiredMessage="Lütfen kullanıcı adınızı giriniz!"
+                                     placeholder="Kullanıcı Adı"/> 
+                        <h:outputText value="Şifre"/>
+                        <p:password id="password" value="#{sessionBean.kullanici.SIFRE}"  style="width:290px;" 
+                                    required="true" requiredMessage="Lütfen şifrenizi giriniz!"
+                                    placeholder="Şifre" redisplay="true"/>
+                        <p:commandButton value="Giriş" style="width:300px;"  icon="fa fa-sign-in"
+                                         action="#{sessionBean.action()}" update="@form" />                        
+                        <p:commandLink id="OMSveriTabaniAyar" oncomplete="PF('sidebar1').show()">
+                            <h:outputText value="OMS Veri Tabanı Ayarları" style="font-size: small;color: red"/>
+                        </p:commandLink>                        
+                    </h:panelGrid>
+                </p:panel>
+            </h:form> 
+        </div>
+        <p:sidebar widgetVar="sidebar1" position="right" baseZIndex="10000">
+          <h:form id="OMSVeriTabaniKaydetForm" style="text-align: center;">            
+            <h3 style="font-weight:bold">OMS Veri Tabanı Ayarları</h3>
+            <h:panelGrid columns="1" cellpadding="5">
+                    <p:inputText id="OMSVTSunucuAdi" value="#{sessionBean.OMSVeriTabaniAyar.SUNUCU_ADI}" 
+                                 style="width:300px" required="true" requiredMessage="Lütfen OMS veri tabanı sunucu adını giriniz!"
+                                 placeholder="OMS V.T. Sunucu Adı"/>
+                    <p:inputText id="OMSVTSunucuPortNumarasi" value="#{sessionBean.OMSVeriTabaniAyar.SUNUCU_PORT_NUMARASI}" 
+                                 style="width:300px" required="true" requiredMessage="Lütfen OMS veri tabanı sunucusu port numarasını giriniz!"
+                                 placeholder="OMS V.T. Sunucusu Port No."/>
+                    <p:inputText id="OMSVTAdi" value="#{sessionBean.OMSVeriTabaniAyar.VERI_TABANI_ADI}" 
+                                 style="width:300px" required="true" requiredMessage="Lütfen OMS veri tabanı adını giriniz!"
+                                 placeholder="OMS V.T. Adı"/>
+                    <p:inputText id="OMSVTKullaniciAdi" value="#{sessionBean.OMSVeriTabaniAyar.KULLANICI_ADI}" 
+                                 style="width:300px" required="true" requiredMessage="Lütfen OMS veri tabanı kullanıcı adını giriniz!"
+                                 placeholder="OMS V.T. Kullanıcı Adı"/>
+                    <p:password id="OMSVTKullaniciSifresi" value="#{sessionBean.OMSVeriTabaniAyar.KULLANICI_SIFRE}" 
+                                 style="width:300px" required="true" redisplay="true"
+                                 requiredMessage="Lütfen OMS veri tabanı kullanıcı şifresini giriniz!"
+                                 placeholder="OMS V.T. Kullanıcı Şifresi"/>
+                    <f:facet name="footer">
+                        <p:commandButton value="Test Et" action="#{sessionBean.baglantiTestEtOMS()}"
+                                         icon="fa fa-cog" update="OMSVeriTabaniKaydetForm" 
+                                         process="OMSVeriTabaniKaydetForm"/>
+                    </f:facet> 
+            </h:panelGrid>
+            <p:messages id="messages" showDetail="false" closable="false"/>
+          </h:form>
+        </p:sidebar>
+    </h:body>
+</html>
+

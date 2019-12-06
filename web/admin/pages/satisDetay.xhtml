@@ -1,0 +1,718 @@
+<ui:composition template="templateAdmin.xhtml"
+     xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:f="http://java.sun.com/jsf/core"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:p="http://primefaces.org/ui">    
+    <ui:define name="content">
+        <style type="text/css">
+            .value {
+                font-weight: bold;
+            }
+
+            .ui-datatable {
+                margin-bottom: 25px
+            }
+
+            .ui-datatable .ui-datatable-footer {
+                text-align:left;
+            }
+
+            .ui-datalist ul {
+                padding: 0 0 0 10px;
+                margin: 5px 0;
+            }
+
+            .ui-datatable .ui-button-icon-only .ui-button-text {
+                padding: 0;
+                line-height: 1.2;
+            }
+            
+            .ui-datatable-header {
+                height: 25px
+            }
+            
+            .layout-wrapper .topbar {
+                z-index: 10000000;
+             }
+
+             .layout-wrapper .layout-menu {
+                z-index: 9999999;
+             }
+            
+            .blue {
+                background-image: none !important;
+                color: blue !important;
+            }
+            .green {
+                background-image: none !important;
+                color: green !important;
+            }
+            .red {
+                background-image: none !important;
+                color: orange !important;
+            }
+            .purple {
+                background-image: none !important;
+                color: purple !important;
+            }
+            .ui-paginator a {
+                margin-right: 5px;
+            }
+            .bold {
+                background-image: none !important;
+                color: red !important;
+                font-weight: bold;
+                font-size: 18px;
+            }
+            .light {
+                background-image: none !important;
+                color: red !important;
+            }
+            .noBorders tr, .noBorders td {
+                background: none !important;
+                border: none !important;
+            }
+            .ui-grid td {
+                white-space: nowrap;
+            }
+            
+            .AAA {
+                background-color: #fa9200 !important;
+                background-image: none !important;
+                color: #ffffff !important;
+            }
+        </style>
+        <p:breadCrumb id="breadCrumb">
+                <p:menuitem value="Ana Sayfa" url="/admin/pages/welcomeAdmin.jsf" />
+                <p:menuitem value="Satış" url="/admin/pages/satis.jsf" />
+                <p:menuitem value="Teklif Detay" url="/admin/pages/satisDetay.jsf" />
+        </p:breadCrumb>
+        <h:form id="satisTeklifDetayForm" prependId="false">            
+            <p:growl id="growl" showDetail="false" sticky="false" escape="false"/> 
+                <center>
+                    <h:panelGrid columns="2" cellpadding="5" style="alignment-adjust: auto" > 
+                        <p:commandButton value="Müşteri:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/>
+                        <h:outputLabel id="musteriUnvani" value="#{satisBean.secilenTeklifBaslik.musteriUnvani}" style="font-size:14px;"/>
+                    </h:panelGrid>
+                
+                    <h:panelGrid id="panelGrid"
+                        columns="10" cellpadding="5" style="align-content: center" > 
+                        <p:commandButton value="Teklif No:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/>
+                        <h:outputLabel id="teklifNo" value="#{satisBean.secilenTeklifBaslik.TEKLIF_NUMARASI}" style="font-size:14px;"/>
+
+                        <p:commandButton value="Teklif Tarihi.:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/>
+                        <h:outputLabel id="tarihi" value="#{satisBean.secilenTeklifBaslik.TEKLIF_TARIHI}" style="font-size:14px;">
+                            <f:convertDateTime pattern="dd.MM.yyyy" />
+                        </h:outputLabel>
+
+                        <p:commandButton value="Tutar:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/>
+                        <h:outputLabel id="toplamTutar" 
+                                       value="#{satisBean.secilenTeklifBaslik.TEKLIF_TUTARI}"
+                                       rendered="#{satisBean.secilenTeklifBaslik.TEKLIF_PARA_BIRIMI==1}"
+                                       style="font-size:14px;font-weight: bold">
+                            <f:convertNumber type="currency" currencySymbol="$" locale="tr"/>
+                        </h:outputLabel>                        
+                        <h:outputLabel value="#{satisBean.secilenTeklifBaslik.TEKLIF_TUTARI}"
+                                       rendered="#{satisBean.secilenTeklifBaslik.TEKLIF_PARA_BIRIMI==20}"
+                                       style="font-size:14px;font-weight: bold">
+                            <f:convertNumber type="currency" currencySymbol="€" locale="tr"/>
+                        </h:outputLabel>
+                        <h:outputLabel value="#{satisBean.secilenTeklifBaslik.TEKLIF_TUTARI}"
+                                  rendered="#{satisBean.secilenTeklifBaslik.TEKLIF_PARA_BIRIMI==0}"
+                                  style="font-size:14px;font-weight: bold">
+                            <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                        </h:outputLabel>
+                        
+                        <p:commandButton value="Tutar (TL):" disabled="true" 
+                                         style="color: white; background-color: darkblue;font-size:14px;"/>
+                        <h:outputLabel value="#{satisBean.secilenTeklifBaslik.teklifTutariCarpiKur}"
+                                       rendered="#{satisBean.secilenTeklifBaslik.TEKLIF_PARA_BIRIMI==1}"
+                                       style="font-size:14px">
+                            <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                        </h:outputLabel>
+                        <h:outputLabel value="#{satisBean.secilenTeklifBaslik.teklifTutariCarpiKur}"
+                                       rendered="#{satisBean.secilenTeklifBaslik.TEKLIF_PARA_BIRIMI==20}"
+                                       style="font-size:14px">
+                            <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                        </h:outputLabel>
+                        <h:outputText value="#{satisBean.secilenTeklifBaslik.TEKLIF_TUTARI}"
+                                      rendered="#{satisBean.secilenTeklifBaslik.TEKLIF_PARA_BIRIMI==0}"
+                                      style="font-size:14px">
+                            <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                        </h:outputText>
+                        
+                        <p:commandButton value="Kur:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/>
+                        <h:outputLabel id="kur" value="#{satisBean.secilenTeklifBaslik.TEKLIF_KUR}" style="font-size:14px;">
+                            <f:convertNumber type="currency" currencySymbol=""/>
+                        </h:outputLabel>
+
+                        <p:commandButton value="Revizyon No:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/>
+                        <h:outputLabel id="revizyonNo" value="#{satisBean.secilenTeklifBaslik.GECERLI_TEKLIF_REVIZYON_NUMARASI}" style="font-size:14px;"/>
+ 
+                        <p:commandButton value="Durumu:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/>
+                        <h:outputLabel id="durumu" value="#{satisBean.secilenTeklifBaslik.TEKLIF_DURUM_KODU_ACIKLAMA}" style="font-size:14px;"
+                                        styleClass="#{satisBean.secilenTeklifBaslik.TEKLIF_DURUM_KODU eq 98 ? 'red' : 
+                                                           satisBean.secilenTeklifBaslik.TEKLIF_DURUM_KODU eq 1 ? 'blue' : 
+                                                               satisBean.secilenTeklifBaslik.TEKLIF_DURUM_KODU eq 99 ? 'green' : 
+                                                                    satisBean.secilenTeklifBaslik.TEKLIF_DURUM_KODU eq 96 ? 'purple' : null}"/>                    
+                    
+                        <p:commandButton value="Müşteri Marjı:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/>
+                        <p:outputPanel>
+                            <p:spinner id="ajaxSpinner" style="font-size:14px;"
+                                       prefix="%" min="0" size="5"
+                                       value="#{satisBean.secilenTeklifBaslik.MUSTERI_MARJ}">
+                                <p:ajax process="@this" />
+                            </p:spinner>
+                            <p:commandButton icon="fa fa-pagelines" 
+                                             style ="float:right;font-size: 14px;margin-left: 3px"
+                                             update=":satisTeklifDetayForm:panelGrid teklifSatirlariDataTable" immediate="false"
+                                             actionListener="#{satisBean.guncelleMusteriMarjiBaslik()}"/>
+                        </p:outputPanel>
+                    </h:panelGrid>
+                    <h:panelGrid columns="1" style=" width: 100%;text-align: center">
+                        <p:inputTextarea value="#{satisBean.secilenTeklifBaslik.MUSTERI_YANIT}" 
+                                         style="width: 80%; height: auto;font-size:14px"
+                                     placeholder="Müşteri henüz açıklama girmemiştir." />
+                    </h:panelGrid>
+                    <h:panelGrid columns="4" style=" width: 40%;text-align: center;font-size: 14px">
+                        <p:commandButton value="Kaydet" action="#{satisBean.kaydetSatisTeklifi()}"
+                                         icon="fa fa-floppy-o" id="kaydetButon" update="growl"
+                                         style="text-align: center; margin-top: 15px;"/>
+                        <p:commandButton value="Satın Alma Teklifi Oluştur" action="#{satisBean.satistanSatinAlmaTeklifiOlustur()}"
+                                         icon="fa fa-list-alt" id="satinAlmaTeklifiOlusturButon" update="growl"
+                                         style="text-align: center; width: 240px; margin-top: 15px;"/>
+                        <p:commandButton value="Müşteriye Gönder" action="#{satisBean.mailPrepare()}"
+                                         icon="fa fa-send" id="gonderButon" update="growl"
+                                         style="text-align: center; width: 200px; margin-top: 15px;"/>
+                        <p:commandButton value="Sipariş Olarak Aktar" action="#{satisBean.siparisOlarakAktar()}"
+                                         icon="fa fa-database" id="siparisButon" update="growl"
+                                         style="text-align: center; width: 200px; margin-top: 15px;">
+                            <p:confirm header="Sipariş Aktarma Onayı" message="Sipariş olarak aktarmak istediğinizden emin misiniz?" icon="fa fa-bell-o" />
+                        </p:commandButton>                        
+                        <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">
+                            <center>
+                                <p:commandButton value="Evet" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-check" />
+                                <p:commandButton value="Hayır" type="button" styleClass="ui-confirmdialog-no" icon="fa fa-close" />
+                            </center>
+                        </p:confirmDialog>
+                    </h:panelGrid>
+                </center>   
+            
+                <p:dialog 
+                    widgetVar="tedarikci"
+                    id="tedarikciDialog"
+                    minimizable="true"
+                    maximizable="true"
+                    modal="true"
+                    appendTo="@(body)"
+                    dynamic="true"
+                    showEffect="fade" 
+                    hideEffect="explode"
+                    header="Tedarikçiler (#{satisBean.secilenTeklifSatir.MALZEME_HIZMET_MASRAF_KODU} - #{satisBean.secilenTeklifSatir.MALZEME_HIZMET_MASRAF_ADI} - #{satisBean.secilenTeklifSatir.MALZEME_HIZMET_MASRAF_ADI2})">
+                    <h:form>
+                        <p:dataTable id="tedarikciDataTable" 
+                                    var="tedarikci" 
+                                    value="#{satisBean.secilenTeklifSatir.tedarikciListesi}" 
+                                    selectionMode="single"
+                                    selection="#{satisBean.secilenTeklifSatir.secilenTedarikci}" 
+                                    rowKey="#{tedarikci.musteriRecordId}"
+                                    filteredValue="#{satisBean.secilenTeklifSatir.tedarikciListesiFiltreleme}"
+                                    style="font-size:12px;">
+                           <p:ajax event="rowSelect" listener="#{satisBean.tedarikciSecildiDogrudanTemin}" 
+                                   update="@([id$=tedarikciOutputText])" 
+                                   oncomplete="PF('tedarikci').hide();"/>
+                           <p:column headerText="Tedarikçi" 
+                                     filterBy="#{tedarikci.musteriKoduVeUnvani}"
+                                     filterMatchMode="contains">
+                               <h:outputText value="#{tedarikci.musteriKoduVeUnvani}" />
+                           </p:column>
+                       </p:dataTable>
+                    </h:form>                    
+                </p:dialog>
+            
+                <p:remoteCommand name="refresh" update="@([id$=tedarikciOutputText]) @([id$=tutarKolon1]) @([id$=tutarKolon2]) @([id$=tutarKolon3])
+                                                        @([id$=tutarKolon4]) @([id$=tutarKolon5]) @([id$=tutarKolon6]) @([id$=tutarKolon7])
+                                                        @([id$=birimFiyatOutputText]) @([id$=birimFiyatInputText]) 
+                                                        @([id$=maliyetOutputText]) @([id$=maliyetInputText])"/>
+                  <p:dataTable 
+                         rowStyleClass="#{teklifSatir.MALZEME_HIZMET_MASRAF_KODU eq 'AAA' ? 'AAA' : null}"
+                         editable="true" editMode="cell"
+                         var="teklifSatir" 
+                         value="#{satisBean.teklifSatirlari}"
+                         id="teklifSatirlariDataTable"  
+                         draggableColumns="true"
+                         rowIndexVar="index"
+                         rowKey="#{teklifSatir.TEKLIF_SATIR_ID}"
+                         paginator="true" rows="50" 
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                         style="font-size:12px;">                      
+                    <f:facet name="header">
+                        Teklif Satırları
+                        <div style="float:left">
+                            <p:commandButton icon="fa fa-refresh" update="@([id$=growl])"
+                                             value="Mail Güncelle" action="#{satisBean.guncelleMailler()}" />
+                        </div>
+                        <div style="float:right">
+                            <p:commandButton icon="fa fa-download" ajax="false"
+                                      value="PDF İndir" action="#{satisBean.downloadPdf()}" />
+                            
+                            <p:commandButton icon="fa fa-download" ajax="false"
+                                      value="Excel İndir" action="#{satisBean.downloadXlsx()}" />
+                        </div>
+                    </f:facet>
+                    <p:ajax event="cellEdit" listener="#{satisBean.maliyetDegisti(teklifSatir)}"
+                            update=":satisTeklifDetayForm:panelGrid" oncomplete="refresh();"/>
+                    <p:column style="width:16px" visible="#{satisBean.sessionBean.kullanici.aktifPasifTutarBoolean}">
+                        <p:rowToggler />
+                    </p:column>
+                    <p:column style="width:25px;text-align:center">
+                        <f:facet name="header">
+                            <h:outputText value="Sıra" />
+                        </f:facet>
+                        <h:outputText value="#{index + 1}" />
+                    </p:column>
+                    <p:column headerText="Kod" sortBy="#{teklifSatir.MALZEME_HIZMET_MASRAF_KODU}" width="60" >
+                        <p:inplace>
+                            <p:inputText value="#{teklifSatir.MALZEME_HIZMET_MASRAF_KODU}">
+                                <p:ajax process="@this" />
+                            </p:inputText>
+                        </p:inplace>
+                    </p:column>
+                    <p:column headerText="Ad" sortBy="#{teklifSatir.MALZEME_HIZMET_MASRAF_ADI}">
+                        <h:outputText value="#{teklifSatir.MALZEME_HIZMET_MASRAF_ADI}"/>
+                    </p:column>
+                    <p:column headerText="Ad (2)" sortBy="#{teklifSatir.MALZEME_HIZMET_MASRAF_ADI2}">
+                        <h:outputText value="#{teklifSatir.MALZEME_HIZMET_MASRAF_ADI2}"/>
+                    </p:column>
+                    <p:column headerText="Açıklama" sortBy="#{teklifSatir.MALZEME_HIZMET_MASRAF_ACIKLAMASI}">
+                        <h:outputText value="#{teklifSatir.MALZEME_HIZMET_MASRAF_ACIKLAMASI}" />
+                    </p:column>
+                    <p:column headerText="Tedarikçi" sortBy="#{teklifSatir.secilenTedarikciKodu}">
+                        <h:outputText id="tedarikciOutputText"
+                            value="#{teklifSatir.secilenTedarikciKodu}-#{teklifSatir.secilenTedarikciUnvani}" />
+                        <p:commandButton icon="fa fa-search-plus" 
+                                         update="@([id$=tedarikciDialog])"
+                                         action="#{satisBean.onIslemeDogrudanTemin()}"
+                                         oncomplete="PF('tedarikci').show();">
+                            <f:setPropertyActionListener value="#{teklifSatir}" target="#{satisBean.secilenTeklifSatir}" />
+                        </p:commandButton> 
+                        <p:commandButton icon="fa fa-remove" 
+                                         update="@([id$=tedarikciOutputText])" 
+                                         action="#{satisBean.temizleTedarikciDogrudanTemin()}">
+                            <f:setPropertyActionListener value="#{teklifSatir}" target="#{satisBean.secilenTeklifSatir}" />
+                        </p:commandButton>
+                        <p:commandButton icon="fa fa-refresh" 
+                                         update="@([id$=tedarikciSelectCheckboxMenu])" 
+                                         action="#{satisBean.guncelleSatirTedarikcileri()}">
+                            <f:setPropertyActionListener value="#{teklifSatir}" target="#{satisBean.secilenTeklifSatir}" />
+                        </p:commandButton>
+                    </p:column>
+                    <p:column id="tedarikciKolon" headerText="Tedarikçiler" style="font-size:12px;">
+                        <p:selectCheckboxMenu id="tedarikciSelectCheckboxMenu" style="font-size:12px;" 
+                                              value="#{teklifSatir.secilenTedarikciListesi}" 
+                                              label="Tedarikçiler" 
+                                              multiple="true" filter="true" 
+                                              filterMatchMode="contains" 
+                                              converter="mailListSatinAlmaConverter"
+                                              disabled="#{teklifSatir.teminTuru}">
+                            <p:ajax event="change" process="@([id$=tedarikciSelectCheckboxMenu])"/>
+                            <p:ajax event="toggleSelect" update="@([id$=tedarikciSelectCheckboxMenu])"/>
+                            <f:selectItems value="#{teklifSatir.tedarikciListesi}" var="tedarikci" 
+                                           itemValue="#{tedarikci}" itemLabel="#{tedarikci.musteriKoduVeUnvani}"/>
+                        </p:selectCheckboxMenu>
+                        <p:selectBooleanButton id="teminTuru" 
+                                               value="#{teklifSatir.teminTuruTersi}" 
+                                               onLabel="Tedarik" offLabel="Stok" 
+                                               onIcon="fa fa-truck" offIcon="fa fa-cubes" 
+                                               style="width:100px;font-size:12px;">
+                            <p:ajax update="tedarikciSelectCheckboxMenu" immediate="true"
+                                    listener="#{satisBean.degistirSatirTeminTuru(teklifSatir)}"/>
+                        </p:selectBooleanButton> 
+                    </p:column>
+                    <p:column headerText="Fiili Stok" sortBy="#{teklifSatir.fiiliStok}" width="40">
+                      <h:outputText value="#{teklifSatir.fiiliStok}" />
+                    </p:column> 
+                    <p:column headerText="Miktar" sortBy="#{teklifSatir.MALZEME_HIZMET_MASRAF_MIKTARI}" width="40">
+                        <h:outputText value="#{teklifSatir.MALZEME_HIZMET_MASRAF_MIKTARI} #{teklifSatir.MALZEME_HIZMET_MASRAF_BIRIM_KODU}" />
+                    </p:column>                     
+                    <p:column headerText="Miktar (Müşteri)" sortBy="#{teklifSatir.MUSTERI_SATIS_MIKTAR_YANIT}" width="50">
+                        <h:outputText value="#{teklifSatir.MUSTERI_SATIS_MIKTAR_YANIT}" 
+                                      styleClass="#{teklifSatir.MUSTERI_SATIS_MIKTAR_YANIT gt teklifSatir.MALZEME_HIZMET_MASRAF_MIKTARI ? 'light' : teklifSatir.MUSTERI_SATIS_MIKTAR_YANIT eq teklifSatir.MALZEME_HIZMET_MASRAF_MIKTARI ? null : 'bold'}"/>
+                    </p:column>
+                    <p:column sortBy="#{teklifSatir.MALZEME_HIZMET_MASRAF_BIRIM_FIYATI}" width="40" 
+                              visible="#{satisBean.sessionBean.kullanici.aktifPasifTutarBoolean}">
+                        <f:facet name="header">
+                            <h:outputText value="Birim Fiyat" />
+                        </f:facet>
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText id="birimFiyatOutputText" value="#{teklifSatir.MALZEME_HIZMET_MASRAF_BIRIM_FIYATI}">
+                                    <f:convertNumber type="currency" currencySymbol="" locale="tr"/>
+                                </h:outputText>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputNumber id="birimFiyatInputText" value="#{teklifSatir.MALZEME_HIZMET_MASRAF_BIRIM_FIYATI}"
+                                               decimalSeparator="," thousandSeparator="." disabled="true">                                    
+                                </p:inputNumber>
+                            </f:facet>
+                        </p:cellEditor>                         
+                    </p:column>
+                    <p:column headerText="Müşteri Marjı" width="60">
+                        <p:outputPanel>
+                            <p:spinner id="ajaxSpinner" style="font-size:14px;"
+                                       prefix="%" min="0" size="5"
+                                       value="#{teklifSatir.MUSTERI_MARJ}">
+                                <p:ajax process="@this" 
+                                        update="satistanTedarikciKayitlariDataTable 
+                                                :satisTeklifDetayForm:panelGrid"
+                                        listener="#{satisBean.guncelleMusteriMarjiSatir(teklifSatir)}"
+                                        oncomplete="refresh();"/>
+                            </p:spinner>
+                        </p:outputPanel>
+                    </p:column>
+                    <p:column sortBy="#{teklifSatir.MALIYET_BIRIM_FIYAT}" width="40"
+                              visible="#{satisBean.sessionBean.kullanici.aktifPasifTutarBoolean}">
+                        <f:facet name="header">
+                            <h:outputText value="Maliyet" />
+                        </f:facet>
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText id="maliyetOutputText" value="#{teklifSatir.MALIYET_BIRIM_FIYAT}">
+                                    <f:convertNumber type="currency" currencySymbol="" locale="tr"/>
+                                </h:outputText>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputNumber id="maliyetInputText" value="#{teklifSatir.MALIYET_BIRIM_FIYAT}"
+                                               decimalSeparator="," thousandSeparator=".">
+                                </p:inputNumber>
+                            </f:facet>
+                        </p:cellEditor>                         
+                    </p:column>
+                    <p:column headerText="Son Hareketler" width="110"
+                              visible="#{satisBean.sessionBean.kullanici.aktifPasifTutarBoolean}">                         
+                        <h:panelGrid cellpadding="1" styleClass="noBorders">
+                            <p:row>
+                                <p:column>
+                                     <h:outputLabel id="sonSatinAlmaTeklifFiyati" value="#{teklifSatir.sonTeklifVeSatinAlmaSatisSatiri.sonSatinAlmaTeklifFiyati}"
+                                                   style="font-size: 11px;font-weight: bold">
+                                          <f:convertNumber type="currency" currencySymbol="" locale="tr"/>
+                                      </h:outputLabel>
+                                </p:column>
+                                <p:column>
+                                    <h:outputLabel id="sonSatinAlmaTeklifTarihi" value="#{teklifSatir.sonTeklifVeSatinAlmaSatisSatiri.sonSatinAlmaTeklifTarihi}" 
+                                                  style="font-size: 10px;">
+                                        <f:convertDateTime pattern="-dd.MM.yy" />
+                                    </h:outputLabel>
+                                    <h:outputLabel id="sonSatinAlmaTeklifTarihi1" style="font-size: 10px;"
+                                                   rendered="#{teklifSatir.sonTeklifVeSatinAlmaSatisSatiri.sonSatinAlmaTeklifTarihi == null}" value="-00.00.00"/>
+                                </p:column>
+                            </p:row>
+                            <p:row>
+                                <p:column>
+                                    <h:outputLabel id="sonSatinAlmaFiyati" value="#{teklifSatir.sonTeklifVeSatinAlmaSatisSatiri.sonSatinAlmaFiyati}"
+                                                  style="font-size: 11px;font-weight: bold">
+                                        <f:convertNumber type="currency" currencySymbol="" locale="tr"/>
+                                    </h:outputLabel>
+                                </p:column>
+                                <p:column>
+                                    <h:outputLabel id="sonSatinAlmaTarihi" value="#{teklifSatir.sonTeklifVeSatinAlmaSatisSatiri.sonSatinAlmaTarihi}" 
+                                                  style="font-size: 10px;">
+                                        <f:convertDateTime pattern="-dd.MM.yy" />
+                                    </h:outputLabel>
+                                    <h:outputLabel id="sonSatinAlmaTarihi1" style="font-size: 10px;"
+                                                   rendered="#{teklifSatir.sonTeklifVeSatinAlmaSatisSatiri.sonSatinAlmaTarihi == null}" value="-00.00.00"/>
+                                </p:column>
+                            </p:row>
+                        </h:panelGrid>             
+                        <p:tooltip for="sonSatinAlmaTeklifTarihi" value="Son Teklif Tarihi"
+                                   showEffect="clip" hideEffect="explode" position="top"/>
+                        <p:tooltip for="sonSatinAlmaTeklifTarihi1" value="Son Teklif Tarihi"
+                                   showEffect="clip" hideEffect="explode" position="top"/>
+                        <p:tooltip for="sonSatinAlmaTeklifFiyati" value="#{teklifSatir.sonTeklifVeSatinAlmaSatisSatiri.sonTeklifCari}"
+                                   showEffect="clip" hideEffect="explode" position="left"/>
+                        <p:tooltip for="sonSatinAlmaTarihi" value="Son Satın Alma Tarihi"
+                                   showEffect="clip" hideEffect="explode" position="bottom"/>
+                        <p:tooltip for="sonSatinAlmaTarihi1" value="Son Satın Alma Tarihi"
+                                   showEffect="clip" hideEffect="explode" position="bottom"/>
+                        <p:tooltip for="sonSatinAlmaFiyati" value="#{teklifSatir.sonTeklifVeSatinAlmaSatisSatiri.sonSatinAlmaCari}"
+                                   showEffect="clip" hideEffect="explode" position="left"/>
+                    </p:column>
+                    <p:column headerText="Tutar" sortBy="#{teklifSatir.MALZEME_HIZMET_MASRAF_TUTARI}" width="60"
+                              visible="#{satisBean.sessionBean.kullanici.aktifPasifTutarBoolean}">  
+                        <h:outputText value="#{teklifSatir.MALZEME_HIZMET_MASRAF_TUTARI}"
+                                  id="tutarKolon1" rendered="#{teklifSatir.PARA_BIRIMI==1}"
+                                  style="font-weight: bold">
+                        <f:convertNumber type="currency" currencySymbol="$" locale="tr"/>
+                        </h:outputText>
+                        <h:outputText value="#{teklifSatir.MALZEME_HIZMET_MASRAF_TUTARI}"
+                                      id="tutarKolon2" rendered="#{teklifSatir.PARA_BIRIMI==20}"
+                                      style="font-weight: bold">
+                            <f:convertNumber type="currency" currencySymbol="€" locale="tr"/>
+                        </h:outputText>
+                        <h:outputText value="#{teklifSatir.MALZEME_HIZMET_MASRAF_TUTARI}"
+                                      id="tutarKolon3" rendered="#{teklifSatir.PARA_BIRIMI==0}"
+                                      style="font-weight: bold">
+                            <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                        </h:outputText>
+                        <h:outputText value=" "/>
+                        <h:outputText value="#{teklifSatir.malzemeHizmetMasrafTutariCarpiKur}"
+                                      id="tutarKolon4" rendered="#{teklifSatir.PARA_BIRIMI==1}">
+                            <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                        </h:outputText>
+                        <h:outputText value="#{teklifSatir.malzemeHizmetMasrafTutariCarpiKur}"
+                                      id="tutarKolon5" rendered="#{teklifSatir.PARA_BIRIMI==20}">
+                            <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                        </h:outputText>
+                        <h:outputText value=" "/>                    
+                        <h:outputText value="Kur: #{teklifSatir.KUR}" id="tutarKolon6"
+                                      rendered="#{teklifSatir.PARA_BIRIMI==1}">
+                        </h:outputText>
+                        <h:outputText value="Kur: #{teklifSatir.KUR}" id="tutarKolon7"
+                                      rendered="#{teklifSatir.PARA_BIRIMI==20}">
+                        </h:outputText>
+                    </p:column>
+                    <p:rowExpansion>
+                          <p:dataTable value="#{teklifSatir.tanimliSatisFiyatiList}"
+                                       var="tanimliSatisFiyati" selectionMode="single"
+                                       rowKey="#{tanimliSatisFiyati.sanalId}"
+                                       style="width: 25%"
+                                       rendered="#{teklifSatir.tanimliSatisFiyatiList.size()>0}">
+                              <f:facet name="header">Tanımlı Satış Fiyatları</f:facet>
+                              <p:ajax event="rowSelect"  listener="#{satisBean.tanimliSatisFiyatiDegisti}" 
+                                      update=":satisTeklifDetayForm:teklifSatirlariDataTable:birimFiyatOutputText
+                                            :satisTeklifDetayForm:teklifSatirlariDataTable:birimFiyatInputText
+                                            :satisTeklifDetayForm:teklifSatirlariDataTable:maliyetOutputText
+                                            :satisTeklifDetayForm:teklifSatirlariDataTable:maliyetInputText
+                                            :satisTeklifDetayForm:teklifSatirlariDataTable:tedarikciOutputText
+                                            :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon1
+                                            :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon2
+                                            :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon3
+                                            :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon4
+                                            :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon5
+                                            :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon6
+                                            :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon7
+                                            :satisTeklifDetayForm:panelGrid"/>
+                              <p:column headerText="Fiyat">
+                                <h:outputText value="#{tanimliSatisFiyati.fiyat}"
+                                      rendered="#{teklifSatir.PARA_BIRIMI==20}"
+                                      style="font-weight: bold">
+                                    <f:convertNumber type="currency" currencySymbol="€" locale="tr"/>
+                                </h:outputText>
+                                <h:outputText value="#{tanimliSatisFiyati.fiyat}"
+                                              rendered="#{teklifSatir.PARA_BIRIMI==0}"
+                                              style="font-weight: bold">
+                                    <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                                </h:outputText>
+                                <h:outputText value="#{tanimliSatisFiyati.fiyat}"
+                                              rendered="#{teklifSatir.PARA_BIRIMI==1}"
+                                              style="font-weight: bold">
+                                    <f:convertNumber type="currency" currencySymbol="$" locale="tr"/>
+                                </h:outputText>  
+                              </p:column>
+                              <p:column headerText="Tanım Türü">
+                                <h:outputText value="Liste Tanımlı"
+                                              rendered="#{tanimliSatisFiyati.musteriMiListeMi==1}"/>
+                                <h:outputText value="Müşteriye Tanımlı"
+                                              rendered="#{tanimliSatisFiyati.musteriMiListeMi==0}"/>
+                              </p:column>                            
+                          </p:dataTable> 
+                        
+                          <p:dataTable value="#{teklifSatir.satistanTedarikciKayitlariList}" 
+                                       var="satistanTedarikciKayitlari" selectionMode="single"
+                                       rowKey="#{satistanTedarikciKayitlari.SATISTAN_TEDARIKCI_KAYITLARI_ID}"
+                                       selection="#{satisBean.secilenSatistanTedarikciKayitlari}" 
+                                       style="font-size:10px;"
+                                       id="satistanTedarikciKayitlariDataTable"
+                                       rendered="#{teklifSatir.satistanTedarikciKayitlariList.size()>0}">
+                            <f:facet name="header">Tedarikçi Yanıtları</f:facet>
+                            <p:ajax event="rowSelect"  listener="#{satisBean.satistanTedarikciKayitlariDegisti}" 
+                                    update=":satisTeklifDetayForm:teklifSatirlariDataTable:birimFiyatOutputText
+                                            :satisTeklifDetayForm:teklifSatirlariDataTable:birimFiyatInputText
+                                            :satisTeklifDetayForm:teklifSatirlariDataTable:maliyetOutputText
+                                            :satisTeklifDetayForm:teklifSatirlariDataTable:maliyetInputText
+                                            :satisTeklifDetayForm:teklifSatirlariDataTable:tedarikciOutputText
+                                            :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon1
+                                            :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon2
+                                            :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon3
+                                            :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon4
+                                            :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon5
+                                            :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon6
+                                            :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon7
+                                            :satisTeklifDetayForm:panelGrid"/>
+                            <p:ajax event="contextMenu"  listener="#{satisBean.contextMenu}"/>
+                            <p:column headerText="Durumu" width="98">
+                                <p:selectBooleanButton
+                                    value="#{satistanTedarikciKayitlari.mailAdresTamamlandiMiBoolean}" 
+                                    onLabel="Tamamlandı" offLabel="Tamamlanmadı" disabled="true" 
+                                    onIcon="fa fa-check" offIcon="fa fa-close" 
+                                    style="width:98px;font-size:10px;"/>
+                            </p:column> 
+                            <p:column headerText="Müşteri">
+                                <h:outputText value="#{satistanTedarikciKayitlari.musteriMusteriKoduVeUnvani}" />
+                            </p:column>
+                            <p:column headerText="Mail adresi">
+                                <h:outputText value="#{satistanTedarikciKayitlari.mailAdresMailAdresi}"/>
+                            </p:column>
+                            <p:column headerText="Yanıtlayan Ad Soyad" width="80">
+                                <h:outputText value="#{satistanTedarikciKayitlari.mailAdresYanitlayanAdSoyad}"/>
+                            </p:column>
+                            <p:column headerText="Açıklama" width="100">
+                                <h:outputText value="#{satistanTedarikciKayitlari.teklifSatirYanitAciklama}"/>
+                            </p:column>
+                            <p:column headerText="Miktar" width="90">
+                                <h:outputText value="#{satistanTedarikciKayitlari.teklifSatirYanitMiktar}"
+                                              styleClass="#{satistanTedarikciKayitlari.teklifSatirYanitMiktar gt teklifSatir.MALZEME_HIZMET_MASRAF_MIKTARI ? 'light' : satistanTedarikciKayitlari.teklifSatirYanitMiktar eq teklifSatir.MALZEME_HIZMET_MASRAF_MIKTARI ? null : 'bold'}"/>
+                            </p:column>  
+                            <p:column headerText="Birim" width="30">
+                                <h:outputText value="#{satistanTedarikciKayitlari.teklifSatirYanitBirim.subSequence(0, 3)}"/>
+                            </p:column>
+                            <p:column headerText="Birim Fiyat" width="50">
+                                <h:outputText value="#{satistanTedarikciKayitlari.teklifSatirYanitBirimFiyat}"
+                                              rendered="#{satistanTedarikciKayitlari.mailAdresParaBirimi=='USD'}">
+                                    <f:convertNumber type="currency" currencySymbol="$" locale="tr"/>
+                                </h:outputText>
+                                <h:outputText value="#{satistanTedarikciKayitlari.teklifSatirYanitBirimFiyat}"
+                                              rendered="#{satistanTedarikciKayitlari.mailAdresParaBirimi=='EUR'}">
+                                    <f:convertNumber type="currency" currencySymbol="€" locale="tr"/>
+                                </h:outputText>
+                                <h:outputText value="#{satistanTedarikciKayitlari.teklifSatirYanitBirimFiyat}"
+                                              rendered="#{satistanTedarikciKayitlari.mailAdresParaBirimi=='TL'}">
+                                    <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                                </h:outputText>                                
+                                <h:outputText value=" "/>
+                                <h:outputText value="#{satistanTedarikciKayitlari.teklifSatirYanitBirimFiyat 
+                                                       *satistanTedarikciKayitlari.mailAdresKur}"
+                                              rendered="#{satistanTedarikciKayitlari.mailAdresParaBirimi=='EUR'}">
+                                    <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                                </h:outputText>
+                                <h:outputText value="#{satistanTedarikciKayitlari.teklifSatirYanitBirimFiyat 
+                                                       * satistanTedarikciKayitlari.mailAdresKur}"
+                                              rendered="#{satistanTedarikciKayitlari.mailAdresParaBirimi=='USD'}">
+                                    <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                                </h:outputText>
+                                <h:outputText value=" "/>                    
+                                <h:outputText value="Kur: #{satistanTedarikciKayitlari.mailAdresKur}"
+                                              rendered="#{satistanTedarikciKayitlari.mailAdresParaBirimi=='EUR'}">
+                                </h:outputText>
+                                <h:outputText value="Kur: #{satistanTedarikciKayitlari.mailAdresKur}"
+                                              rendered="#{satistanTedarikciKayitlari.mailAdresParaBirimi=='USD'}">
+                                </h:outputText>                                
+                            </p:column>
+                            <p:column headerText="Müşteri Marjı" width="45">
+                                <h:outputText value="#{teklifSatir.MUSTERI_MARJ}"
+                                              style="font-size:10px;">
+                                </h:outputText>
+                            </p:column> 
+                            <p:column headerText="Müşteri Fiyatı" width="50">
+                                <h:outputText value="#{teklifSatir.MUSTERI_MARJ / 100 
+                                                        * satistanTedarikciKayitlari.teklifSatirYanitBirimFiyat
+                                                        + satistanTedarikciKayitlari.teklifSatirYanitBirimFiyat}"
+                                               rendered="#{satistanTedarikciKayitlari.mailAdresParaBirimi=='TL'}"
+                                               style="font-weight: bold;font-size:10px;">
+                                    <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                                </h:outputText>
+                                <h:outputText value="#{teklifSatir.MUSTERI_MARJ  / 100
+                                                        * satistanTedarikciKayitlari.teklifSatirYanitBirimFiyat
+                                                        + satistanTedarikciKayitlari.teklifSatirYanitBirimFiyat}"
+                                               rendered="#{satistanTedarikciKayitlari.mailAdresParaBirimi=='USD'}"
+                                               style="font-weight: bold;font-size:10px;">
+                                    <f:convertNumber type="currency" currencySymbol="$" locale="tr"/>
+                                </h:outputText>
+                                <h:outputText value="#{teklifSatir.MUSTERI_MARJ  / 100
+                                                        * satistanTedarikciKayitlari.teklifSatirYanitBirimFiyat
+                                                        + satistanTedarikciKayitlari.teklifSatirYanitBirimFiyat}"
+                                               rendered="#{satistanTedarikciKayitlari.mailAdresParaBirimi=='EUR'}"
+                                               style="font-weight: bold;font-size:10px;">
+                                    <f:convertNumber type="currency" currencySymbol="€" locale="tr"/>
+                                </h:outputText>
+                                <h:outputText value=" "/>
+                                <h:outputText value="#{(teklifSatir.MUSTERI_MARJ  / 100
+                                                       * satistanTedarikciKayitlari.teklifSatirYanitBirimFiyat
+                                                       + satistanTedarikciKayitlari.teklifSatirYanitBirimFiyat)
+                                                       * satistanTedarikciKayitlari.mailAdresKur}"
+                                              rendered="#{satistanTedarikciKayitlari.mailAdresParaBirimi=='USD'}"
+                                              style="font-weight: bold;font-size:10px;">
+                                    <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                                </h:outputText>
+                                <h:outputText value="#{(teklifSatir.MUSTERI_MARJ  / 100
+                                                       * satistanTedarikciKayitlari.teklifSatirYanitBirimFiyat
+                                                       + satistanTedarikciKayitlari.teklifSatirYanitBirimFiyat)
+                                                       * satistanTedarikciKayitlari.mailAdresKur}"
+                                              rendered="#{satistanTedarikciKayitlari.mailAdresParaBirimi=='EUR'}"
+                                              style="font-weight: bold;font-size:10px;">
+                                    <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                                </h:outputText>
+                                <h:outputText value=" "/>
+                                <h:outputText value="Kur: #{satistanTedarikciKayitlari.mailAdresKur}"
+                                              rendered="#{satistanTedarikciKayitlari.mailAdresParaBirimi=='EUR'}">
+                                </h:outputText>
+                                <h:outputText value="Kur: #{satistanTedarikciKayitlari.mailAdresKur}"
+                                              rendered="#{satistanTedarikciKayitlari.mailAdresParaBirimi=='USD'}">
+                                </h:outputText>                                  
+                            </p:column>
+                            <p:column headerText="Kar Tutarı" width="50">
+                                <h:outputText value="#{(teklifSatir.MUSTERI_MARJ  / 100
+                                                       * satistanTedarikciKayitlari.teklifSatirYanitBirimFiyat
+                                                       + satistanTedarikciKayitlari.teklifSatirYanitBirimFiyat)
+                                                       - satistanTedarikciKayitlari.teklifSatirYanitBirimFiyat}"
+                                               rendered="#{satistanTedarikciKayitlari.mailAdresParaBirimi=='TL'}">
+                                    <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                                </h:outputText>
+                                <h:outputText value="#{(teklifSatir.MUSTERI_MARJ  / 100
+                                                       * satistanTedarikciKayitlari.teklifSatirYanitBirimFiyat
+                                                       + satistanTedarikciKayitlari.teklifSatirYanitBirimFiyat)
+                                                       - satistanTedarikciKayitlari.teklifSatirYanitBirimFiyat}"
+                                               rendered="#{satistanTedarikciKayitlari.mailAdresParaBirimi=='USD'}">
+                                    <f:convertNumber type="currency" currencySymbol="$" locale="tr"/>
+                                </h:outputText>
+                                <h:outputText value="#{(teklifSatir.MUSTERI_MARJ / 100
+                                                       * satistanTedarikciKayitlari.teklifSatirYanitBirimFiyat
+                                                       + satistanTedarikciKayitlari.teklifSatirYanitBirimFiyat)
+                                                       - satistanTedarikciKayitlari.teklifSatirYanitBirimFiyat}"
+                                               rendered="#{satistanTedarikciKayitlari.mailAdresParaBirimi=='EUR'}">
+                                    <f:convertNumber type="currency" currencySymbol="€" locale="tr"/>
+                                </h:outputText>
+                                <h:outputText value=" "/>
+                                <h:outputText value="#{((teklifSatir.MUSTERI_MARJ / 100
+                                                       * satistanTedarikciKayitlari.teklifSatirYanitBirimFiyat
+                                                       + satistanTedarikciKayitlari.teklifSatirYanitBirimFiyat)
+                                                       - satistanTedarikciKayitlari.teklifSatirYanitBirimFiyat)
+                                                       * satistanTedarikciKayitlari.mailAdresKur}"
+                                              rendered="#{satistanTedarikciKayitlari.mailAdresParaBirimi=='USD'}">
+                                    <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                                </h:outputText>
+                                <h:outputText value="#{((teklifSatir.MUSTERI_MARJ / 100
+                                                       * satistanTedarikciKayitlari.teklifSatirYanitBirimFiyat
+                                                       + satistanTedarikciKayitlari.teklifSatirYanitBirimFiyat)
+                                                       - satistanTedarikciKayitlari.teklifSatirYanitBirimFiyat)
+                                                       * satistanTedarikciKayitlari.mailAdresKur}"
+                                              rendered="#{satistanTedarikciKayitlari.mailAdresParaBirimi=='EUR'}">
+                                    <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                                </h:outputText>
+                                <h:outputText value=" "/>
+                                <h:outputText value="Kur: #{satistanTedarikciKayitlari.mailAdresKur}"
+                                              rendered="#{satistanTedarikciKayitlari.mailAdresParaBirimi=='EUR'}">
+                                </h:outputText>
+                                <h:outputText value="Kur: #{satistanTedarikciKayitlari.mailAdresKur}"
+                                              rendered="#{satistanTedarikciKayitlari.mailAdresParaBirimi=='USD'}">
+                                </h:outputText>                                  
+                            </p:column>
+                            <p:column headerText="Stok" width="35">
+                                <p:selectBooleanButton 
+                                    value="#{satistanTedarikciKayitlari.teklifSatirYanitStoktaVarYokBoolean}"
+                                    onLabel="Var" offLabel="Yok" disabled="true"
+                                    onIcon="fa fa-check" offIcon="fa fa-close" 
+                                    style="width:40px;font-size:10px;"/>
+                            </p:column>                           
+                          </p:dataTable>
+                          <p:contextMenu for="satistanTedarikciKayitlariDataTable">
+                              <p:menuitem value="Teklif Girişine Aç"  style="font-size: 10px" icon="fa fa-external-link"
+                                          action="#{satisBean.teklifGirisineAc()}"  update=":satisTeklifDetayForm:teklifSatirlariDataTable:satistanTedarikciKayitlariDataTable">
+                              </p:menuitem>
+                          </p:contextMenu>
+                    </p:rowExpansion>
+                </p:dataTable>                    
+        </h:form> 
+    </ui:define>
+</ui:composition>

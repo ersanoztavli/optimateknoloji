@@ -1,0 +1,343 @@
+<ui:composition template="templateAdmin.xhtml"
+     xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:f="http://java.sun.com/jsf/core"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:p="http://primefaces.org/ui">    
+    <f:metadata>
+        <f:event type="preRenderView" listener="#{satisBean.ilkCalisan}"/>
+    </f:metadata>
+    <ui:define name="content">
+        <style type="text/css">
+            .value {
+                font-weight: bold;
+            }
+
+            .ui-datatable {
+                margin-bottom: 25px;
+            }
+
+            .ui-datatable .ui-datatable-footer {
+                text-align:left;
+            }
+
+            .ui-datalist ul {
+                padding: 0 0 0 10px;
+                margin: 5px 0;
+            }
+
+            .ui-datatable .ui-button-icon-only .ui-button-text {
+                padding: 0;
+                line-height: 1.2;
+            }
+            
+            .ui-datatable-header {
+                height: 35px
+            }
+            
+            .layout-wrapper .topbar {
+                z-index: 10000000;
+             }
+
+             .layout-wrapper .layout-menu {
+                z-index: 9999999;
+             }
+            
+            .blue {
+                background-image: none !important;
+                color: blue !important;
+            }
+            .green {
+                background-image: none !important;
+                color: green !important;
+            }
+            .red {
+                background-image: none !important;
+                color: orange !important;
+            }
+            .purple {
+                background-image: none !important;
+                color: purple !important;
+            }
+        </style>
+        <p:breadCrumb id="breadCrumb">
+                <p:menuitem value="Ana Sayfa" url="/admin/pages/welcomeAdmin.jsf" />
+                <p:menuitem value="Satış" url="/admin/pages/satis.jsf" />
+        </p:breadCrumb>
+        <h:form id="satisTeklifBaslikForm"> 
+          <p:growl id="growl" showDetail="false" sticky="false" escape="false"/>
+            <p:dataTable var="teklifBaslik" value="#{satisBean.teklifBasliklari}" 
+                         filteredValue="#{satisBean.teklifBasliklariFiltreleme}"
+                         paginator="true" style="font-size:12px;"
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                         rows="50"
+                         id="teklifBasliklariDataTable"  
+                         draggableColumns="true"
+                         rowIndexVar="index"
+                         rowKey="#{teklifBaslik.TEKLIF_BASLIK_ID}"
+                         selection="#{satisBean.secilenTeklifBaslikListesi}">
+                <f:facet name="header">
+                    Satış Teklifleri
+                     <p:commandButton icon="fa fa-refresh" style="float:left"
+                                      value="Yenile" update="teklifBasliklariDataTable"
+                                      action="#{satisBean.satisTeklifleriniYenile()}" />
+                     <p:commandButton icon="fa fa-refresh" style="float:right"
+                                      value="ERP'den Yenile" update="teklifBasliklariDataTable"
+                                      action="#{satisBean.satisTeklifleriniKaydetERPden()}" />
+                     <p:commandButton style="float:left" value="Teklif Yükle"
+                                      icon="fa fa-upload"
+                                      action="#{satisBean.excel()}" />
+                    <p:commandButton id="toggler" type="button" value="Sütunlar" style="float:right" icon="fa fa-server" />
+                    <p:columnToggler datasource="teklifBasliklariDataTable" trigger="toggler" />
+                </f:facet>
+                <p:column headerText="Seç" selectionMode="multiple" style="width:25px;text-align:center"/>
+                <p:column style="width:30px;text-align:center">
+                    <f:facet name="header">
+                        <h:outputText value="Sıra" />
+                    </f:facet>
+                    <h:outputText 
+                        value="#{index + 1}" />
+                </p:column>
+                <p:column headerText="Teklif No." sortBy="#{teklifBaslik.TEKLIF_NUMARASI}"
+                          style="width:85px;text-align:center" filterBy="#{teklifBaslik.TEKLIF_NUMARASI}" filterMatchMode="contains">
+                    <h:outputText value="#{teklifBaslik.TEKLIF_NUMARASI}-#{teklifBaslik.GECERLI_TEKLIF_REVIZYON_NUMARASI}" />
+                </p:column>
+                <p:column headerText="Teklif Ekleyen" sortBy="#{teklifBaslik.SORUMLU_PERSONEL}"
+                          style="width:80px;text-align:center" filterBy="#{teklifBaslik.SORUMLU_PERSONEL}" filterMatchMode="contains">
+                    <h:outputText value="#{teklifBaslik.SORUMLU_PERSONEL}" />
+                </p:column>
+                <p:column headerText="Satış Elemanı" sortBy="#{teklifBaslik.SATIS_ELEMANI}"
+                          style="width:70px;text-align:center" filterBy="#{teklifBaslik.SATIS_ELEMANI}" filterMatchMode="contains">
+                    <h:outputText value="#{teklifBaslik.SATIS_ELEMANI}" />
+                </p:column>
+                <p:column headerText="Tarih" sortBy="#{teklifBaslik.TEKLIF_TARIHI}"
+                          style="width:80px;text-align:center">
+                    <h:outputText value="#{teklifBaslik.TEKLIF_TARIHI}">
+                        <f:convertDateTime pattern="dd.MM.yyyy"/>
+                    </h:outputText>                    
+                </p:column> 
+                <p:column headerText="Tutar" sortBy="#{teklifBaslik.TEKLIF_TUTARI}"
+                          style="width:100px;text-align:center" 
+                          filterBy="#{teklifBaslik.TEKLIF_TUTARI}" filterMatchMode="contains">                    
+                    <h:outputText value="#{teklifBaslik.TEKLIF_TUTARI}"
+                                  rendered="#{teklifBaslik.TEKLIF_PARA_BIRIMI=='1'}"
+                                  style="font-weight: bold">
+                        <f:convertNumber type="currency" currencySymbol="$" locale="tr"/>
+                    </h:outputText>
+                    <h:outputText value="#{teklifBaslik.TEKLIF_TUTARI}"
+                                  rendered="#{teklifBaslik.TEKLIF_PARA_BIRIMI=='20'}"
+                                  style="font-weight: bold">
+                        <f:convertNumber type="currency" currencySymbol="€" locale="tr"/>
+                    </h:outputText>
+                    <h:outputText value="#{teklifBaslik.TEKLIF_TUTARI}"
+                                  rendered="#{teklifBaslik.TEKLIF_PARA_BIRIMI=='0'}"
+                                  style="font-weight: bold">
+                        <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                    </h:outputText>
+                    <h:outputText value=" "/>
+                    <h:outputText value="#{teklifBaslik.teklifTutariCarpiKur}"
+                                  rendered="#{teklifBaslik.TEKLIF_PARA_BIRIMI=='1'}">
+                        <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                    </h:outputText>
+                    <h:outputText value="#{teklifBaslik.teklifTutariCarpiKur}"
+                                  rendered="#{teklifBaslik.TEKLIF_PARA_BIRIMI=='20'}">
+                        <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                    </h:outputText>
+                    <h:outputText value=" "/>                    
+                    <h:outputText value="Kur: #{teklifBaslik.TEKLIF_KUR}"
+                                  rendered="#{teklifBaslik.TEKLIF_PARA_BIRIMI=='1'}">
+                    </h:outputText>
+                    <h:outputText value="Kur: #{teklifBaslik.TEKLIF_KUR}"
+                                  rendered="#{teklifBaslik.TEKLIF_PARA_BIRIMI=='20'}">
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Açıklama" 
+                          sortBy="#{teklifBaslik.TEKLIF_ACIKLAMA1} #{teklifBaslik.TEKLIF_ACIKLAMA2} #{teklifBaslik.TEKLIF_ACIKLAMA3}" 
+                          filterBy="#{teklifBaslik.TEKLIF_ACIKLAMA1} #{teklifBaslik.TEKLIF_ACIKLAMA2} #{teklifBaslik.TEKLIF_ACIKLAMA3}" 
+                          filterMatchMode="contains">
+                    <h:outputText value="#{teklifBaslik.TEKLIF_ACIKLAMA1} #{teklifBaslik.TEKLIF_ACIKLAMA2} #{teklifBaslik.TEKLIF_ACIKLAMA3}" />
+                </p:column>
+                <p:column headerText="Belge No" sortBy="#{teklifBaslik.BELGE_NO}" filterBy="#{teklifBaslik.BELGE_NO}" filterMatchMode="contains">
+                    <h:outputText value="#{teklifBaslik.BELGE_NO}" />
+                </p:column>
+                <p:column headerText="Teslim Yeri" style="width:90px;text-align:center"
+                          sortBy="#{teklifBaslik.PROJE_KODU}" filterBy="#{teklifBaslik.PROJE_KODU}" filterMatchMode="contains">
+                    <h:outputText value="#{teklifBaslik.PROJE_KODU}" />
+                </p:column>
+                <p:column headerText="Müşteri" 
+                          sortBy="#{teklifBaslik.musteriUnvani}" 
+                          filterBy="#{teklifBaslik.musteriUnvani}" 
+                          filterMatchMode="contains">
+                    <h:outputText value="#{teklifBaslik.musteriUnvani}" />
+                </p:column>               
+                <p:column headerText="Durumu" sortBy="#{teklifBaslik.TEKLIF_DURUM_KODU_ACIKLAMA}"
+                          style="width:70px;text-align:center" filterBy="#{teklifBaslik.TEKLIF_DURUM_KODU_ACIKLAMA}" filterMatchMode="contains">
+                    <h:outputText value="#{teklifBaslik.TEKLIF_DURUM_KODU_ACIKLAMA}" 
+                                  styleClass="#{teklifBaslik.TEKLIF_DURUM_KODU eq 98 ? 'red' : 
+                                                   teklifBaslik.TEKLIF_DURUM_KODU eq 1 ? 'blue' : 
+                                                      teklifBaslik.TEKLIF_DURUM_KODU eq 99 ? 'green' : 
+                                                           teklifBaslik.TEKLIF_DURUM_KODU eq 96 ? 'purple' : null}"/>
+                </p:column>                
+                <p:column style="width:90px;text-align: center" headerText="Detay">
+                    <p:inputSwitch onLabel="..." offLabel="X" id="oncelikliTedarikcilerSwitch"
+                        value="#{teklifBaslik.oncelikliTedarikcilerGelsinMi}" />
+                    <p:inputSwitch onLabel="..." offLabel="X" id="tekTedarikciKabuluSwitch"
+                        value="#{teklifBaslik.oncelikliTedarikcilerGelsinMi}" />
+                    <p:tooltip for="oncelikliTedarikcilerSwitch" value="Öncelikli Tedarikçi"
+                               trackMouse="true" position="top"/>
+                    <p:tooltip for="tekTedarikciKabuluSwitch" value="Tek Tedarikçi Kabulu"
+                               trackMouse="true" position="top"/>
+                    <p:commandButton icon="fa fa-search-plus"
+                                     action="#{satisBean.satisTeklifDetaylariniGetirERPden()}">
+                       <f:setPropertyActionListener value="#{teklifBaslik}" target="#{satisBean.secilenTeklifBaslik}" />
+                    </p:commandButton>
+                </p:column>
+                <p:column style="width:40px;text-align: center" headerText="Revize">
+                    <p:commandButton icon="fa fa-edit"
+                                     action="#{satisBean.revizeEtSatisTeklifi()}">
+                       <f:setPropertyActionListener value="#{teklifBaslik}" target="#{satisBean.revizeEdilecekTeklifBaslik}" />
+                    </p:commandButton>
+                </p:column>
+                <f:facet name="footer">
+                    <p:commandButton process="teklifBasliklariDataTable" icon="fa fa-eye-slash" 
+                                     actionListener="#{satisBean.satisTeklifleriniGizleOnIsleme}"
+                                     value="Gizle" action="#{satisBean.satisTeklifleriniGizle}"
+                                     update="teklifBasliklariDataTable,satisTeklifBaslikForm:growl">
+                        <p:confirm header="Gizleme Onayı" icon="fa fa-bell-o"
+                                   message="Gizlemek istediğinizden emin misiniz?"/>
+                    </p:commandButton>
+                    <p:commandButton value="Gizlenenleri Göster" icon="fa fa-eye" onclick="PF('gizlenenler').show();" 
+                                     type="button" action="#{satisBean.gizlenenSatisTeklifleriniGetir}"/>                    
+                </f:facet>
+            </p:dataTable>
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">
+                <center>
+                    <p:commandButton value="Evet" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-check"/>
+                    <p:commandButton value="Hayır" type="button" styleClass="ui-confirmdialog-no" icon="fa fa-close" />
+                </center>
+            </p:confirmDialog> 
+         </h:form>  
+        
+        <p:dialog header="Gizlenen Satış Teklifleri" widgetVar="gizlenenler" id="gizlenenTeklifBasliklariDialog"
+                  maximizable="true" modal="true" appendTo="@(body)" dynamic="true">
+             <p:ajax event="open" listener="#{satisBean.gizlenenSatinAlmaTeklifleriniGetir}" update="gizlenenSatisTeklifBaslikForm"/>
+             <p:ajax event="close" listener="#{satisBean.gizlenenSatinAlmaTeklifleriniGetir}" update="gizlenenSatisTeklifBaslikForm"/> 
+               <h:form id="gizlenenSatisTeklifBaslikForm">
+                <p:dataTable var="gizlenenTeklifBaslik" 
+                     value="#{satisBean.gizlenenTeklifBasliklari}" 
+                     filteredValue="#{satisBean.gizlenenTeklifBasliklariFiltreleme}"                                                  
+                     paginator="true" style="font-size:14px;"
+                     paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                     rows="15"
+                     rowsPerPageTemplate="15,30,45"
+                     id="gizlenenTeklifBasliklariDataTable"
+                     draggableColumns="true"
+                     rowIndexVar="index"
+                     rowKey="#{gizlenenTeklifBaslik.TEKLIF_BASLIK_ID}"
+                     selection="#{satisBean.secilenGizlenmisTeklifBaslikListesi}">
+                     <f:facet name="header">
+                        Gizlenen Satış Teklifleri                            
+                    </f:facet>
+                    <p:column headerText="Seç" selectionMode="multiple" style="width:25px;text-align:center"/>
+                    <p:column style="width:30px;text-align:center">
+                        <f:facet name="header">
+                            <h:outputText value="Sıra" />
+                        </f:facet>
+                        <h:outputText 
+                            value="#{index + 1}" />
+                    </p:column>                    
+                    <p:column headerText="Teklif No." sortBy="#{gizlenenTeklifBaslik.TEKLIF_NUMARASI}"
+                              style="width:65px;text-align:center" filterBy="#{gizlenenTeklifBaslik.TEKLIF_NUMARASI}" filterMatchMode="contains">
+                        <h:outputText value="#{gizlenenTeklifBaslik.TEKLIF_NUMARASI}" />
+                    </p:column>
+                    <p:column headerText="Teklif Ekleyen" sortBy="#{gizlenenTeklifBaslik.SORUMLU_PERSONEL}"
+                              style="width:80px;text-align:center" filterBy="#{gizlenenTeklifBaslik.SORUMLU_PERSONEL}" filterMatchMode="contains">
+                        <h:outputText value="#{gizlenenTeklifBaslik.SORUMLU_PERSONEL}" />
+                    </p:column>
+                    <p:column headerText="Satış Elemanı" sortBy="#{gizlenenTeklifBaslik.SATIS_ELEMANI}"
+                              style="width:70px;text-align:center" filterBy="#{gizlenenTeklifBaslik.SATIS_ELEMANI}" filterMatchMode="contains">
+                        <h:outputText value="#{gizlenenTeklifBaslik.SATIS_ELEMANI}" />
+                    </p:column>
+                    <p:column headerText="Tarih" sortBy="#{gizlenenTeklifBaslik.TEKLIF_TARIHI}"
+                              style="width:80px;text-align:center">
+                        <h:outputText value="#{gizlenenTeklifBaslik.TEKLIF_TARIHI}">
+                            <f:convertDateTime pattern="dd.MM.yyyy"/>
+                        </h:outputText>                    
+                    </p:column>        
+                    <p:column headerText="Revizyon" sortBy="#{gizlenenTeklifBaslik.GECERLI_TEKLIF_REVIZYON_NUMARASI}"
+                              style="width:55px;text-align:center">
+                        <h:outputText value="#{gizlenenTeklifBaslik.GECERLI_TEKLIF_REVIZYON_NUMARASI}" />
+                    </p:column> 
+                    <p:column headerText="Tutar" sortBy="#{gizlenenTeklifBaslik.TEKLIF_TUTARI}"
+                              style="width:100px;text-align:center" 
+                              filterBy="#{gizlenenTeklifBaslik.TEKLIF_TUTARI}" filterMatchMode="contains">                    
+                        <h:outputText value="#{gizlenenTeklifBaslik.TEKLIF_TUTARI}"
+                                      rendered="#{gizlenenTeklifBaslik.TEKLIF_PARA_BIRIMI=='1'}"
+                                      style="font-weight: bold">
+                            <f:convertNumber type="currency" currencySymbol="$" locale="tr"/>
+                        </h:outputText>
+                        <h:outputText value="#{gizlenenTeklifBaslik.TEKLIF_TUTARI}"
+                                      rendered="#{gizlenenTeklifBaslik.TEKLIF_PARA_BIRIMI=='20'}"
+                                      style="font-weight: bold">
+                            <f:convertNumber type="currency" currencySymbol="€" locale="tr"/>
+                        </h:outputText>
+                        <h:outputText value="#{gizlenenTeklifBaslik.TEKLIF_TUTARI}"
+                                      rendered="#{gizlenenTeklifBaslik.TEKLIF_PARA_BIRIMI=='0'}"
+                                      style="font-weight: bold">
+                            <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                        </h:outputText>
+                        <h:outputText value=" "/>
+                        <h:outputText value="#{gizlenenTeklifBaslik.teklifTutariCarpiKur}"
+                                      rendered="#{gizlenenTeklifBaslik.TEKLIF_PARA_BIRIMI=='1'}">
+                            <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                        </h:outputText>
+                        <h:outputText value="#{gizlenenTeklifBaslik.teklifTutariCarpiKur}"
+                                      rendered="#{gizlenenTeklifBaslik.TEKLIF_PARA_BIRIMI=='20'}">
+                            <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                        </h:outputText>
+                        <h:outputText value=" "/>                    
+                        <h:outputText value="Kur: #{gizlenenTeklifBaslik.TEKLIF_KUR}"
+                                      rendered="#{gizlenenTeklifBaslik.TEKLIF_PARA_BIRIMI=='1'}">
+                        </h:outputText>
+                        <h:outputText value="Kur: #{gizlenenTeklifBaslik.TEKLIF_KUR}"
+                                      rendered="#{gizlenenTeklifBaslik.TEKLIF_PARA_BIRIMI=='20'}">
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Açıklama" sortBy="#{gizlenenTeklifBaslik.TEKLIF_ACIKLAMA1} #{gizlenenTeklifBaslik.TEKLIF_ACIKLAMA2} #{gizlenenTeklifBaslik.TEKLIF_ACIKLAMA3}" 
+                              filterBy="#{gizlenenTeklifBaslik.TEKLIF_ACIKLAMA1} #{gizlenenTeklifBaslik.TEKLIF_ACIKLAMA2} #{gizlenenTeklifBaslik.TEKLIF_ACIKLAMA3}" 
+                              filterMatchMode="contains">
+                        <h:outputText value="#{gizlenenTeklifBaslik.TEKLIF_ACIKLAMA1} #{gizlenenTeklifBaslik.TEKLIF_ACIKLAMA2} #{gizlenenTeklifBaslik.TEKLIF_ACIKLAMA3}" />
+                    </p:column>
+                    <p:column headerText="Belge No" sortBy="#{gizlenenTeklifBaslik.BELGE_NO}" filterBy="#{gizlenenTeklifBaslik.BELGE_NO}" filterMatchMode="contains">
+                        <h:outputText value="#{gizlenenTeklifBaslik.BELGE_NO}" />
+                    </p:column>
+                    <p:column headerText="Teslim Yeri" style="width:90px;text-align:center"
+                              sortBy="#{gizlenenTeklifBaslik.PROJE_KODU}" filterBy="#{gizlenenTeklifBaslik.PROJE_KODU}" filterMatchMode="contains">
+                        <h:outputText value="#{gizlenenTeklifBaslik.PROJE_KODU}" />
+                    </p:column>
+                    <p:column headerText="Müşteri" sortBy="#{gizlenenTeklifBaslik.musteriUnvani}" filterBy="#{gizlenenTeklifBaslik.musteriUnvani}" filterMatchMode="contains">
+                        <h:outputText value="#{gizlenenTeklifBaslik.musteriUnvani}" />
+                    </p:column>               
+                    <p:column headerText="Durumu" sortBy="#{gizlenenTeklifBaslik.TEKLIF_DURUM_KODU_ACIKLAMA}"
+                              style="width:70px;text-align:center" filterBy="#{gizlenenTeklifBaslik.TEKLIF_DURUM_KODU_ACIKLAMA}" filterMatchMode="contains">
+                        <h:outputText value="#{gizlenenTeklifBaslik.TEKLIF_DURUM_KODU_ACIKLAMA}" 
+                                      styleClass="#{gizlenenTeklifBaslik.TEKLIF_DURUM_KODU eq 98 ? 'red' : 
+                                                       gizlenenTeklifBaslik.TEKLIF_DURUM_KODU eq 1 ? 'blue' : 
+                                                          gizlenenTeklifBaslik.TEKLIF_DURUM_KODU eq 99 ? 'green' : 
+                                                               gizlenenTeklifBaslik.TEKLIF_DURUM_KODU eq 96 ? 'purple' : null}"/>
+                    </p:column>
+                     <f:facet name="footer">
+                        <p:commandButton process="gizlenenTeklifBasliklariDataTable" icon="fa fa-mail-reply-all" 
+                                         value="Geri Getir" 
+                                         actionListener="#{satisBean.satisTeklifleriniGeriGetirOnIsleme}"
+                                         action="#{satisBean.satisTeklifleriniGeriGetir}"
+                                         update="gizlenenTeklifBasliklariDataTable,satisTeklifBaslikForm:growl,satisTeklifBaslikForm:teklifBasliklariDataTable">
+                            <p:confirm header="Geri getirme Onayı" icon="fa fa-bell-o"
+                                       message="Geri getirmek istediğinizden emin misiniz?"/>
+                         </p:commandButton>                  
+                     </f:facet>
+                </p:dataTable>
+               </h:form>
+        </p:dialog> 
+    </ui:define>
+</ui:composition>

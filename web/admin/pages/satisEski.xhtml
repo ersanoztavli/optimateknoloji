@@ -1,0 +1,133 @@
+<ui:composition template="templateAdmin.xhtml"
+     xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:f="http://java.sun.com/jsf/core"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:p="http://primefaces.org/ui">    
+    <ui:define name="content">
+        <style type="text/css">
+            .value {
+                font-weight: bold;
+            }
+
+            .ui-datatable {
+                margin-bottom: 25px;
+            }
+
+            .ui-datatable .ui-datatable-footer {
+                text-align:left;
+            }
+
+            .ui-datalist ul {
+                padding: 0 0 0 10px;
+                margin: 5px 0;
+            }
+
+            .ui-datatable .ui-button-icon-only .ui-button-text {
+                padding: 0;
+                line-height: 1.2;
+            }
+            
+            .ui-datatable-header {
+                height: 35px
+            }
+            
+            .layout-wrapper .topbar {
+                z-index: 10000000;
+             }
+
+             .layout-wrapper .layout-menu {
+                z-index: 9999999;
+             }
+            
+            .blue {
+                background-image: none !important;
+                color: blue !important;
+            }
+            .green {
+                background-image: none !important;
+                color: green !important;
+            }
+            .red {
+                background-image: none !important;
+                color: orange !important;
+            }
+        </style>
+        <p:breadCrumb>
+                <p:menuitem value="Ana Sayfa" url="/admin/pages/welcomeAdmin.jsf" />
+                <p:menuitem value="Satış" url="/admin/pages/satis.jsf" />
+        </p:breadCrumb>
+        <h:form id="satisTeklifBaslikForm"> 
+            <p:dataTable var="teklifBaslik" value="#{satisBean.teklifBasliklari}" 
+                         paginator="true" style="font-size:14px;"
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rows="15"
+                         rowsPerPageTemplate="15,30,45"
+                         id="teklifBasliklariDataTable"  
+                         draggableColumns="true"
+                         rowIndexVar="index"
+                         rowKey="#{teklifBaslik.TEKLIF_NUMARASI}" 
+                         selection="#{satisBean.secilenTeklifBaslikListesi}"
+                         rowStyleClass="#{teklifBaslik.TEKLIF_DURUM_KODU eq 0 ? null : teklifBaslik.TEKLIF_DURUM_KODU eq 1 ? null: teklifBaslik.TEKLIF_DURUM_KODU eq 2 ? null : null}">
+                <f:facet name="header">
+                    Satış Teklifleri Listesi
+                     <p:commandButton icon="fa fa-refresh" style="float:left"
+                                      value="ERP'den Yenile" update="teklifBasliklariDataTable"
+                                      action="#{satisBean.satisTeklifleriniKaydetERPden()}" />
+                    <p:commandButton id="toggler" type="button" value="Sütunlar" style="float:right" icon="fa fa-server" />
+                    <p:columnToggler datasource="teklifBasliklariDataTable" trigger="toggler" />
+                </f:facet>
+                <p:column style="width:30px;text-align:center">
+                    <f:facet name="header">
+                        <h:outputText value="Sıra" />
+                    </f:facet>
+                    <h:outputText 
+                        value="#{index + 1}" />
+                </p:column>
+                <p:column headerText="Seç" selectionMode="multiple" style="width:25px;text-align:center"/>
+                <p:column headerText="Teklif No." sortBy="#{teklifBaslik.TEKLIF_NUMARASI}"
+                          style="width:100px;text-align:center">
+                    <h:outputText value="#{teklifBaslik.TEKLIF_NUMARASI}" />
+                </p:column>
+                <p:column headerText="Başlangıç Bitiş" sortBy="#{teklifBaslik.TEKLIF_BASLANGIC_TARIHI}"
+                          style="width:110px;text-align:center">
+                    <h:outputText value="#{teklifBaslik.TEKLIF_BASLANGIC_TARIHI}">
+                        <f:convertDateTime pattern="dd/MM/yyyy" />
+                    </h:outputText>
+                    <h:outputText value=" "/>
+                    <h:outputText value="#{teklifBaslik.TEKLIF_BITIS_TARIHI}" >
+                        <f:convertDateTime pattern="dd/MM/yyyy" />
+                    </h:outputText>
+                </p:column>        
+                <p:column headerText="Revizyon" sortBy="#{teklifBaslik.GECERLI_TEKLIF_REVIZYON_NUMARASI}"
+                          style="width:80px;text-align:center">
+                    <h:outputText value="#{teklifBaslik.GECERLI_TEKLIF_REVIZYON_NUMARASI}" />
+                </p:column>                
+                <p:column headerText="Durumu" sortBy="#{teklifBaslik.TEKLIF_DURUM_KODU_ACIKLAMA}"
+                          style="width:150px;text-align:center">
+                    <h:outputText value="#{teklifBaslik.TEKLIF_DURUM_KODU_ACIKLAMA}" 
+                                  styleClass="#{teklifBaslik.TEKLIF_DURUM_KODU eq 98 ? 'red' : teklifBaslik.TEKLIF_DURUM_KODU eq 1 ? 'blue' : teklifBaslik.TEKLIF_DURUM_KODU eq 99 ? 'green' : null}"/>
+                </p:column>
+                <p:column headerText="Tutar" sortBy="#{teklifBaslik.TEKLIF_TOPLAM_TUTARI}"
+                          style="width:100px;text-align:center">
+                    <h:outputText value="#{teklifBaslik.TEKLIF_TOPLAM_TUTARI}" />
+                    <h:outputText value=" #{teklifBaslik.TEKLIF_PARA_BIRIMI eq 1 ? 'USD' : teklifBaslik.TEKLIF_PARA_BIRIMI eq 20 ? 'EURO' : teklifBaslik.TEKLIF_PARA_BIRIMI eq 0 ? 'TL' : ''}"/>
+                    <h:outputText value=" #{teklifBaslik.TEKLIF_PARA_BIRIMI eq 1 ? teklifBaslik.TEKLIF_KUR : teklifBaslik.TEKLIF_PARA_BIRIMI eq 20 ? teklifBaslik.TEKLIF_KUR : teklifBaslik.TEKLIF_PARA_BIRIMI eq 0 ? '' : ''}"/>
+                </p:column>
+                <p:column headerText="Müşteri" sortBy="#{teklifBaslik.musteriUnvani}">
+                    <h:outputText value="#{teklifBaslik.musteriUnvani}" />
+                </p:column>
+                
+                <p:column style="width:60px;text-align: center" headerText="Detay">
+                    <p:commandButton icon="fa fa-search-plus"
+                                     action="#{satisBean.satisTeklifDetaylariniGetirERPden()}">
+                       <f:setPropertyActionListener value="#{teklifBaslik}" target="#{satisBean.secilenTeklifBaslik}" />
+                    </p:commandButton>
+                </p:column>
+                <f:facet name="footer">
+                    <p:commandButton process="teklifBasliklariDataTable" icon="pi pi-search" value="View"  />
+                </f:facet>
+            </p:dataTable>
+         </h:form>   
+    </ui:define>
+</ui:composition>

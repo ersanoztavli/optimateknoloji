@@ -1,0 +1,149 @@
+<ui:composition template="templateAdmin.xhtml"
+     xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:f="http://java.sun.com/jsf/core"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:p="http://primefaces.org/ui">    
+    <ui:define name="content">
+        <style type="text/css">
+            .value {
+                font-weight: bold;
+            }
+
+            .ui-datatable {
+                margin-bottom: 25px
+            }
+
+            .ui-datatable .ui-datatable-footer {
+                text-align:left;
+            }
+
+            .ui-datalist ul {
+                padding: 0 0 0 10px;
+                margin: 5px 0;
+            }
+
+            .ui-datatable .ui-button-icon-only .ui-button-text {
+                padding: 0;
+                line-height: 1.2;
+            }
+            
+            .ui-datatable-header {
+                height: 35px
+            }
+            
+            .layout-wrapper .topbar {
+                z-index: 10000000;
+            }
+
+            .layout-wrapper .layout-menu {
+                z-index: 9999999;
+            }             
+            .ui-paginator a {
+                margin-right: 5px;
+            }            
+            .bold {
+                background-image: none !important;
+                color: red !important;
+                font-weight: bold;
+                font-size: 18px;
+            }
+            .light {
+                background-image: none !important;
+                color: red !important;
+            }
+        </style>
+        <p:breadCrumb id="breadCrumb">
+                <p:menuitem value="Ana Sayfa" url="/admin/pages/welcomeAdmin.jsf" />
+                <p:menuitem value="Satın Alma" url="/admin/pages/satinAlma.jsf" />
+                <p:menuitem value="Yanıtlar" url="/admin/pages/satinAlmaGonderilenler.jsf" />
+                <p:menuitem value="Detay" url="/admin/pages/satinAlmaGonderilenDetay.jsf" />
+        </p:breadCrumb>
+        <h:form id="satinAlmaGonderilenDetayForm">
+            <p:growl id="growl" showDetail="true" sticky="true" escape="false"/> 
+            <center>
+                <h:panelGrid columns="2" cellpadding="5" style="alignment-adjust: auto" border="1"> 
+                        <p:commandButton value="Tedarikçi:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/> 
+                        <h:outputLabel id="musteriUnvani" value="#{satinAlmaBean.secilenTeklifBaslik.musteriUnvani}"
+                                       style="font-size:14px;"/>
+                </h:panelGrid>
+                <h:panelGrid columns="8" cellpadding="5" border="1"> 
+                    <p:commandButton value="Teklif No:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/> 
+                    <h:outputLabel id="teklifNo" value="#{satinAlmaBean.secilenTeklifBaslik.TEKLIF_NUMARASI}" 
+                                   style="font-size:14px;"/>
+                    
+                    <p:commandButton value="Revizyon No:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/> 
+                    <h:outputLabel id="revizyonNo" value="#{satinAlmaBean.secilenTeklifBaslik.GECERLI_TEKLIF_REVIZYON_NUMARASI}" style="font-size:14px;"/>
+                                        
+                    <p:commandButton value="Baş. Tar.:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/> 
+                    <h:outputLabel id="baslangicTarihi" value="#{satinAlmaBean.secilenTeklifBaslik.TEKLIF_BASLANGIC_TARIHI}" style="font-size:14px;">
+                        <f:convertDateTime pattern="dd.MM.yyyy" />
+                    </h:outputLabel> 
+                    
+                    <p:commandButton value="Bit. Tar.:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/> 
+                    <h:outputLabel id="bitisTarihi" value="#{satinAlmaBean.secilenTeklifBaslik.TEKLIF_BITIS_TARIHI}" style="font-size:14px;">
+                        <f:convertDateTime pattern="dd.MM.yyyy" />
+                    </h:outputLabel>
+                </h:panelGrid>
+                <h:panelGrid columns="2" cellpadding="5" border="1"> 
+                    <p:commandButton value="Para Birimi:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/> 
+                    <h:outputLabel id="paraBirimi" value="#{satinAlmaBean.secilenTeklifBaslik.satinAlmaTedarikciParaBirimi}" 
+                                   style="font-size:14px;"/>
+                </h:panelGrid>
+                <p:commandButton value="ERP'ye Aktar" action="#{satinAlmaBean.erpyeAktar()}" update="@form"
+                                 icon="fa fa-pencil" id="aktarButon" style="text-align: center; width: 200px; margin-top: 15px;"/>
+                <p:commandButton value="Teklif Girişine Aç" action="#{satinAlmaBean.teklifGirisineAc()}" update="@form"
+                                 icon="fa fa-repeat" id="teklifGirisineAcButon" style="text-align: center; width: 220px; margin-top: 15px; margin-left: 15px;"/>
+            </center>
+                <p:dataTable 
+                         var="teklifSatirYanit" value="#{satinAlmaBean.teklifSatirYanitlari}" 
+                         paginator="true"
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rows="15"
+                         rowsPerPageTemplate="15,30,45"
+                         id="teklifSatirlariDataTable" 
+                         rowIndexVar="index"
+                         rowKey="#{teklifSatirYanit.TEKLIF_SATIR_YANIT_ID}"
+                         style="margin: 10px;font-size:14px;">
+                    <f:facet name="header">
+                        Teklif Satırları Listesi
+                    </f:facet>
+                    <p:column style="width:25px;text-align:center">
+                        <f:facet name="header">
+                            <h:outputText value="Sıra" />
+                        </f:facet>
+                        <h:outputText value="#{index + 1}" />
+                    </p:column>   
+                    <p:column headerText="Kod" sortBy="#{teklifSatirYanit.malzemeHizmetMasrafKodu}" width="60">
+                        <h:outputText value="#{teklifSatirYanit.malzemeHizmetMasrafKodu}"/>
+                    </p:column>
+                    <p:column headerText="Ad" sortBy="#{teklifSatirYanit.malzemeHizmetMasrafAdi}">
+                        <h:outputText value="#{teklifSatirYanit.malzemeHizmetMasrafAdi}"/>
+                    </p:column>               
+                    <p:column headerText="Açıklama" sortBy="#{teklifSatirYanit.malzemeHizmetMasrafAciklamasi}">
+                        <h:outputText value="#{teklifSatirYanit.malzemeHizmetMasrafAciklamasi}" />
+                    </p:column>
+                    <p:column headerText="Miktar" sortBy="#{teklifSatirYanit.malzemeHizmetMasrafMiktari}" width="100">
+                        <h:outputText value="#{teklifSatirYanit.malzemeHizmetMasrafMiktari} #{teklifSatirYanit.malzemeHizmetMasrafBirimKodu}" />
+                    </p:column>
+                    <p:column headerText="Miktar (Tedarikçi)" sortBy="#{teklifSatirYanit.MIKTAR}" width="80">
+                        <h:outputText value="#{teklifSatirYanit.MIKTAR}"
+                                    styleClass="#{teklifSatirYanit.MIKTAR gt teklifSatirYanit.malzemeHizmetMasrafMiktari ? 'light' : teklifSatirYanit.MIKTAR eq teklifSatirYanit.malzemeHizmetMasrafMiktari ? null : 'bold'}"/>                        
+                    </p:column>                    
+                    <p:column headerText="Birim (Tedarikçi)" sortBy="#{teklifSatirYanit.BIRIM}" width="100" style="text-align: center">
+                        <h:outputText value="#{teklifSatirYanit.BIRIM}"
+                                    styleClass="#{teklifSatirYanit.BIRIM eq teklifSatirYanit.malzemeHizmetMasrafBirimKodu ? null : 'bold'}"/>
+                    </p:column>
+                    <p:column headerText="Birim Fiyat (Tedarikçi)" sortBy="#{teklifSatirYanit.BIRIM_FIYATI}" width="80" style="text-align: center">
+                        <p:inputNumber value="#{teklifSatirYanit.BIRIM_FIYATI}" disabled="true" decimalSeparator="," thousandSeparator="."/>
+                    </p:column>
+                    <p:column headerText="Açıklama (Tedarikçi)" sortBy="#{teklifSatirYanit.ACIKLAMA}" style="text-align: center">
+                        <p:inputTextarea value="#{teklifSatirYanit.ACIKLAMA}" disabled="true" style="width: 95%; height: auto" autoResize="true"/>
+                    </p:column>                    
+                    <p:column headerText="Stok Durumu (Tedarikçi)" sortBy="#{teklifSatirYanit.STOKTA_VAR_YOK}" width="80" style="text-align: center">
+                        <p:selectBooleanCheckbox value="#{teklifSatirYanit.stoktaVarYokBoolean}" disabled="true"/>
+                    </p:column>
+                </p:dataTable>
+        </h:form> 
+    </ui:define>
+</ui:composition>

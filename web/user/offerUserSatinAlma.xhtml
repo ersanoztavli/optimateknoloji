@@ -1,0 +1,321 @@
+<ui:composition template="templateUser.xhtml"
+     xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:f="http://java.sun.com/jsf/core"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:p="http://primefaces.org/ui"> 
+    <f:metadata>
+        <f:viewParam name="mailAdresId" value="#{offerUserSatinAlmaBean.mailAdresId}"/>
+        <f:event type="preRenderView" listener="#{offerUserSatinAlmaBean.ilkCalisan}"/>
+    </f:metadata>
+    <ui:define name="content">
+        <style type="text/css">
+            .value {
+                font-weight: bold;
+            }
+
+            .ui-datatable {
+                margin-bottom: 25px
+            }
+
+            .ui-datatable .ui-datatable-footer {
+                text-align:right;
+            }
+
+            .ui-datalist ul {
+                padding: 0 0 0 10px;
+                margin: 5px 0;
+            }
+
+            .ui-datatable .ui-button-icon-only .ui-button-text {
+                padding: 0;
+                line-height: 1.2;
+            }
+            
+            .ui-datatable-header {
+                height: 35px
+            }
+            
+            .layout-wrapper .topbar {
+                z-index: 10000000;
+             }
+
+             .layout-wrapper .layout-menu {
+                z-index: 9999999;
+             }
+        </style>
+        <h:form id="form" >
+            <p:growl id="growl" showDetail="false" sticky="false" escape="false"/> 
+            <center>
+                <h:panelGrid columns="4" cellpadding="5" style="alignment-adjust: auto"> 
+                    <p:commandButton value="Firma:"  disabled="true" style="color: white; background-color: darkblue;font-size:12px;"/> 
+                    <h:outputLabel id="firmaUnvani" value="#{offerUserSatinAlmaBean.teklifBaslik.firmaUnvan}" style="font-size:12px;"/>
+
+                    <p:commandButton value="Tedarikçi:"  disabled="true" style="color: white; background-color: darkblue;font-size:12px;"/> 
+                    <h:outputLabel id="musteriUnvani" value="#{offerUserSatinAlmaBean.teklifBaslik.musteriUnvani}" style="font-size:12px;"/>
+                </h:panelGrid>
+                <h:panelGrid columns="10" cellpadding="5" style="alignment-adjust: auto; font-size: 12px"> 
+                    <p:commandButton value="Teklif No:" disabled="true" style="color: white; background-color: darkblue"/> 
+                    <h:outputLabel id="teklifNo" value="#{offerUserSatinAlmaBean.teklifBaslik.TEKLIF_NUMARASI}" />
+                    
+                    <p:commandButton value="Revizyon No:" disabled="true" style="color: white; background-color: darkblue"/> 
+                    <h:outputLabel id="revizyonNo" value="#{offerUserSatinAlmaBean.teklifBaslik.GECERLI_TEKLIF_REVIZYON_NUMARASI}"/>
+                    
+                    <p:commandButton value="Teklif Tar.:" disabled="true" style="color: white; background-color: darkblue;"/> 
+                    <h:outputLabel id="baslangicTarihi" value="#{offerUserSatinAlmaBean.teklifBaslik.TEKLIF_TARIHI}" >
+                        <f:convertDateTime pattern="dd.MM.yyyy" />
+                    </h:outputLabel>                     
+                    
+                    <p:commandButton value="Para Birimi:" disabled="true" style="color: white; background-color: darkblue"/> 
+                    <p:selectOneButton id="paraBirimi" 
+                                       value="#{offerUserSatinAlmaBean.mailAdres.PARA_BIRIMI}"
+                                       disabled="#{offerUserSatinAlmaBean.disabled}"
+                                       required="true" requiredMessage="Lütfen para birimi giriniz!"
+                                       style="width: 100%;">
+                       <p:ajax process="@this" update="@this kur teklifSatirlariDataTable" oncomplete="#{offerUserSatinAlmaBean.guncelleKur()}"/>
+                       <f:selectItem itemLabel="₺" itemValue="TL"/>
+                       <f:selectItem itemLabel="€" itemValue="EUR"/>
+                       <f:selectItem itemLabel="$" itemValue="USD"/>
+                    </p:selectOneButton>
+                    
+                    <p:commandButton value="Kur:" disabled="true" style="color: white; background-color: darkblue"/> 
+                    <p:inputNumber id="kur" value="#{offerUserSatinAlmaBean.mailAdres.KUR}" minValue="1.0" disabled="#{offerUserSatinAlmaBean.disabled}"
+                                   required="true" requiredMessage="Lütfen kur giriniz!" decimalSeparator="," thousandSeparator="." decimalPlaces="4">
+                        <p:ajax update="teklifSatirlariDataTable"/>
+                    </p:inputNumber>    
+                </h:panelGrid>
+                <h:panelGrid columns="4" cellpadding="5" style="text-align: center; margin-top: 10px;font-size: 12px"> 
+                    <p:commandButton value="Ad Soyad:" disabled="true" style="color: white; background-color: darkblue"/> 
+                    <p:inputText value="#{offerUserSatinAlmaBean.mailAdres.teklifYanitlayanAdSoyad}" 
+                                 disabled="#{offerUserSatinAlmaBean.disabled}" 
+                                 style="width: 300px"
+                                 required="true" requiredMessage="Lütfen ad, soyad giriniz."> 
+                    </p:inputText>
+                    <f:facet name="footer">
+                        <p:commandButton value="Teklif Veri Girişini Tamamla" action="#{offerUserSatinAlmaBean.teklifiTamamla()}"
+                                         icon="fa fa-thumbs-up" update="@form" disabled="#{offerUserSatinAlmaBean.disabled}"/>
+                    </f:facet>
+                </h:panelGrid>                
+            </center>
+                <p:remoteCommand name="refreshFooter" 
+                                 update="@([id$=tutarKolon1]) @([id$=tutarKolon2]) @([id$=tutarKolon3])
+                                         @([id$=tutarKolon4]) @([id$=tutarKolon5]) @([id$=tutarKolon6]) @([id$=tutarKolon7])
+                                         @([id$=id1]) @([id$=id2]) @([id$=id3]) @([id$=id4]) @([id$=id5]) @([id$=id6]) @([id$=id7])"/>
+                      
+                <p:dataTable 
+                         var="teklifSatirYanit" value="#{offerUserSatinAlmaBean.teklifSatirYanitlari}"
+                         id="teklifSatirlariDataTable" 
+                         editable="true" editMode="cell"
+                         rowIndexVar="index"
+                         sortBy="#{teklifSatirYanit.TEKLIF_SATIR_YANIT_ID}"
+                         rowKey="#{teklifSatirYanit.TEKLIF_SATIR_YANIT_ID}"
+                         style="margin-top: 10px;font-size:14px;">
+                    <f:facet name="header">
+                        Teklif Satırları Listesi
+                        <div style="float:right;">
+                            <p:commandButton value="Toplam:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/>
+                            <h:outputText value="#{offerUserSatinAlmaBean.toplamTutar}"
+                                          id="id1" rendered="#{offerUserSatinAlmaBean.mailAdres.PARA_BIRIMI == 'TL'}">
+                                <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                            </h:outputText>
+                            <h:outputText value="#{offerUserSatinAlmaBean.toplamTutar}"
+                                          id="id2" rendered="#{offerUserSatinAlmaBean.mailAdres.PARA_BIRIMI == 'USD'}">
+                                <f:convertNumber type="currency" currencySymbol="$" locale="tr"/>
+                            </h:outputText>                            
+                            <h:outputText value="#{offerUserSatinAlmaBean.toplamTutar}"
+                                          id="id3" rendered="#{offerUserSatinAlmaBean.mailAdres.PARA_BIRIMI == 'EUR'}">
+                                <f:convertNumber type="currency" currencySymbol="€" locale="tr"/>
+                            </h:outputText>
+                            <h:outputText value=" "/>    
+                            <h:outputText value="#{offerUserSatinAlmaBean.toplamTutar * offerUserSatinAlmaBean.mailAdres.KUR}"
+                                          id="id4" rendered="#{offerUserSatinAlmaBean.mailAdres.PARA_BIRIMI == 'USD'}">
+                                <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                            </h:outputText>                            
+                            <h:outputText value="#{offerUserSatinAlmaBean.toplamTutar * offerUserSatinAlmaBean.mailAdres.KUR}"
+                                          id="id5" rendered="#{offerUserSatinAlmaBean.mailAdres.PARA_BIRIMI == 'EUR'}">
+                                <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                            </h:outputText>
+                            <h:outputText value=" "/>                    
+                            <h:outputText value="Kur: #{offerUserSatinAlmaBean.mailAdres.KUR}"
+                                          id="id6" rendered="#{offerUserSatinAlmaBean.mailAdres.PARA_BIRIMI == 'USD'}">
+                            </h:outputText>
+                            <h:outputText value="Kur: #{offerUserSatinAlmaBean.mailAdres.KUR}"
+                                          id="id7" rendered="#{offerUserSatinAlmaBean.mailAdres.PARA_BIRIMI == 'EUR'}">
+                            </h:outputText>
+                        </div>
+                        <div style="float:right">
+                            <p:commandButton icon="fa fa-download" ajax="false"
+                                disabled="#{!offerUserSatinAlmaBean.disabled}"
+                                immediate="true" value="PDF İndir" action="#{offerUserSatinAlmaBean.downloadPdf()}" />
+                            <p:commandButton icon="fa fa-download" ajax="false"
+                                disabled="#{!offerUserSatinAlmaBean.disabled}"
+                                immediate="true" value="Excel İndir" action="#{offerUserSatinAlmaBean.downloadXlsx()}" />
+                        </div>
+                        <div style="float:left">
+                            <p:commandButton icon="fa fa-send" 
+                                oncomplete="PF('sidebar1').show()"
+                                disabled="#{!offerUserSatinAlmaBean.disabled}"
+                                value="Mail Gönder" />                         
+                        </div>
+                    </f:facet>
+                    <p:ajax event="cellEdit" oncomplete="refreshFooter();" 
+                            listener="#{offerUserSatinAlmaBean.guncelleTeklifSatirYanit}"/>
+                    <p:column style="width:25px;text-align:center">
+                        <f:facet name="header">
+                            <h:outputText value="Sıra" />
+                        </f:facet>
+                        <h:outputText value="#{index + 1}" />
+                    </p:column>   
+                    <p:column width="70">
+                        <f:facet name="header">
+                            <h:outputText value="Kod" />
+                        </f:facet>
+                        <h:outputText value="#{teklifSatirYanit.malzemeHizmetMasrafKodu}"/>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Ad" />
+                        </f:facet>
+                        <h:outputText value="#{teklifSatirYanit.malzemeHizmetMasrafAdi}"/>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Ad (2)" />
+                        </f:facet>
+                        <h:outputText value="#{teklifSatirYanit.malzemeHizmetMasrafAdi2}"/>
+                    </p:column> 
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Açıklama" />
+                        </f:facet>
+                        <h:outputText value="#{teklifSatirYanit.malzemeHizmetMasrafAciklamasi}" />
+                    </p:column>
+                    <p:column width="100">
+                        <f:facet name="header">
+                            <h:outputText value="Miktar" />
+                        </f:facet>
+                        <h:outputText value="#{teklifSatirYanit.malzemeHizmetMasrafMiktari} 
+                                      #{teklifSatirYanit.malzemeHizmetMasrafBirimKodu.subSequence(0, 3)}" />
+                    </p:column>
+                    <p:column width="80">
+                        <f:facet name="header">
+                            <h:outputText value="Miktar (Tedarikçi)" />
+                        </f:facet>
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <p:inputNumber id ="miktarTedarikci" value="#{teklifSatirYanit.MIKTAR}" disabled="true" decimalSeparator="," thousandSeparator="."/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputNumber id ="miktarTedarikciInput"
+                                               value="#{teklifSatirYanit.MIKTAR}"
+                                               decimalSeparator="," thousandSeparator="."
+                                               disabled="#{offerUserSatinAlmaBean.disabled}">
+                                </p:inputNumber>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+<!--                    <p:column width="105">
+                        <f:facet name="header">
+                            <h:outputText value="Birim (Tedarikçi)" />
+                        </f:facet>
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{teklifSatirYanit.BIRIM}" /></f:facet>
+                            <f:facet name="input">
+                                <h:selectOneMenu value="#{teklifSatirYanit.BIRIM}" style="width:100%" id="birimler" disabled="#{offerUserSatinAlmaBean.disabled}">
+                                    <f:selectItems value="#{teklifSatirYanit.birimListesi}" var="birim" itemLabel="#{birim}" itemValue="#{birim}" />
+                                </h:selectOneMenu>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>              -->
+                    <p:column width="80" style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Birim Fiyat (Tedarikçi)" />
+                        </f:facet>
+                        <p:cellEditor>
+                            <f:facet name="output"> 
+                                <p:inputNumber id ="birimFiyatTedarikci" value="#{teklifSatirYanit.BIRIM_FIYATI}" disabled="true" decimalSeparator="," thousandSeparator="."/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputNumber id ="birimFiyatTedarikciInput"
+                                               value="#{teklifSatirYanit.BIRIM_FIYATI}"
+                                               decimalSeparator="," thousandSeparator="." disabled="#{offerUserSatinAlmaBean.disabled}">
+                                </p:inputNumber>    
+                            </f:facet>
+                        </p:cellEditor> 
+                    </p:column>    
+                    <p:column headerText="Son Teklif Fiyatı" width="80"
+                              sortBy="#{teklifSatirYanit.SONMALIYET}">
+                        <h:outputText value="#{teklifSatirYanit.SONMALIYET}" />
+                    </p:column>                
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Açıklama (Tedarikçi)" />
+                        </f:facet>
+                            <p:inputTextarea id ="aciklamaTedarikciInput" value="#{teklifSatirYanit.ACIKLAMA}" style="width: 95%" disabled="#{offerUserSatinAlmaBean.disabled}">
+                                <p:ajax event="change" process="@this" update="@this"/>  
+                            </p:inputTextarea>
+                    </p:column>
+                    <p:column headerText="Stok Durumu (Tedarikçi)" 
+                              width="70" style="text-align: center" exportable="false">
+                              <p:selectBooleanButton 
+                                id ="stokDurumuInput"
+                                value="#{teklifSatirYanit.stoktaVarYokBoolean}"
+                                onLabel="Var" offLabel="Yok" 
+                                style="width:60px;font-size:10px;"
+                                onIcon="fa fa-check" offIcon="fa fa-close" 
+                                disabled="#{offerUserSatinAlmaBean.disabled}"> 
+                                <p:ajax event="change" process="@this" update="@this"/>   
+                              </p:selectBooleanButton>
+                    </p:column>
+                    <p:column headerText="Tutar" width="60">
+                        <h:outputText id="tutarKolon1" value="#{teklifSatirYanit.BIRIM_FIYATI * teklifSatirYanit.MIKTAR}"
+                                      rendered="#{offerUserSatinAlmaBean.mailAdres.PARA_BIRIMI == 'TL'}">
+                            <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                        </h:outputText>
+                        <h:outputText id="tutarKolon2" value="#{teklifSatirYanit.BIRIM_FIYATI * teklifSatirYanit.MIKTAR}"
+                                      rendered="#{offerUserSatinAlmaBean.mailAdres.PARA_BIRIMI == 'USD'}">
+                            <f:convertNumber type="currency" currencySymbol="$" locale="tr"/>
+                        </h:outputText>
+                        <h:outputText id="tutarKolon3" value="#{teklifSatirYanit.BIRIM_FIYATI * teklifSatirYanit.MIKTAR}"
+                                      rendered="#{offerUserSatinAlmaBean.mailAdres.PARA_BIRIMI == 'EUR'}">
+                            <f:convertNumber type="currency" currencySymbol="€" locale="tr"/>
+                        </h:outputText>
+                        <h:outputText value=" "/>
+                        <h:outputText id="tutarKolon4" value="#{teklifSatirYanit.BIRIM_FIYATI 
+                                                                * teklifSatirYanit.MIKTAR 
+                                                                * offerUserSatinAlmaBean.mailAdres.KUR}"
+                                      rendered="#{offerUserSatinAlmaBean.mailAdres.PARA_BIRIMI == 'USD'}">
+                            <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                        </h:outputText>
+                        <h:outputText id="tutarKolon5" value="#{teklifSatirYanit.BIRIM_FIYATI 
+                                                                * teklifSatirYanit.MIKTAR 
+                                                                * offerUserSatinAlmaBean.mailAdres.KUR}"
+                                      rendered="#{offerUserSatinAlmaBean.mailAdres.PARA_BIRIMI == 'EUR'}">
+                            <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                        </h:outputText>
+                        <h:outputText value=" "/>
+                        <h:outputText id="tutarKolon6" value="Kur: #{offerUserSatinAlmaBean.mailAdres.KUR}"
+                                      rendered="#{offerUserSatinAlmaBean.mailAdres.PARA_BIRIMI == 'USD'}">
+                        </h:outputText>
+                        <h:outputText id="tutarKolon7" value="Kur: #{offerUserSatinAlmaBean.mailAdres.KUR}"
+                                      rendered="#{offerUserSatinAlmaBean.mailAdres.PARA_BIRIMI == 'EUR'}">
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>                
+        </h:form>
+        <p:sidebar widgetVar="sidebar1" position="top" baseZIndex="10000" appendTo="@(body)">
+            <h:form id="mailGonderForm" style="text-align: center; font-size: 14px">
+                <h:panelGrid columns="3" cellpadding="5">
+                    <h:outputText value="E-mail Adresi:"/>
+                    <p:inputText id="mailAdresiTedarikci" value="#{offerUserSatinAlmaBean.mailAdresiTedarikci}" 
+                                 style="width:300px" required="true" requiredMessage="Lütfen e-mail adresi giriniz!"
+                                 placeholder="E-mail adresi"/>
+                    <p:commandButton value="Gönder" action="#{offerUserSatinAlmaBean.mailGonderTedarikci()}"
+                        icon="fa fa-send" update="mailGonderForm" process="mailGonderForm"/>
+                </h:panelGrid>
+            <p:messages id="messages" showDetail="false" closable="false"/>
+            </h:form>
+        </p:sidebar>
+    </ui:define>
+</ui:composition>
+

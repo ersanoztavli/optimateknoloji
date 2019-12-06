@@ -1,0 +1,242 @@
+<ui:composition template="templateAdmin.xhtml"
+     xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:f="http://java.sun.com/jsf/core"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:p="http://primefaces.org/ui">
+    <f:metadata>
+        <f:event type="preRenderView" listener="#{satinAlmaBean.ilkCalisan}"/>
+    </f:metadata>    
+    <ui:define name="content">
+        <style type="text/css">
+            .value {
+                font-weight: bold;
+            }
+
+            .ui-datatable {
+                margin-bottom: 25px
+            }
+
+            .ui-datatable .ui-datatable-footer {
+                text-align:left;
+            }
+
+            .ui-datalist ul {
+                padding: 0 0 0 10px;
+                margin: 5px 0;
+            }
+
+            .ui-datatable .ui-button-icon-only .ui-button-text {
+                padding: 0;
+                line-height: 1.2;
+            }
+            
+            .ui-datatable-header {
+                height: 35px
+            }
+            
+            .layout-wrapper .topbar {
+                z-index: 10000000;
+             }
+
+             .layout-wrapper .layout-menu {
+                z-index: 9999999;
+             }
+        </style>
+        <p:breadCrumb>
+                <p:menuitem value="Ana Sayfa" url="/admin/pages/welcomeAdmin.jsf" />
+                <p:menuitem value="Satın Alma" url="/admin/pages/satinAlma.jsf" />
+        </p:breadCrumb>
+        <h:form id="satinAlmaTeklifBaslikForm"> 
+            <p:growl id="growl" showDetail="false" sticky="false" escape="false"/>
+            <p:dataTable var="teklifBaslik" 
+                         value="#{satinAlmaBean.teklifBasliklari}" 
+                         filteredValue="#{satinAlmaBean.teklifBasliklariFiltreleme}"                                                  
+                         paginator="true" style="font-size:14px;"
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rows="15"
+                         rowsPerPageTemplate="15,30,45"
+                         id="teklifBasliklariDataTable"
+                         draggableColumns="true"
+                         rowIndexVar="index"
+                         rowKey="#{teklifBaslik.TEKLIF_NUMARASI}"
+                         selection="#{satinAlmaBean.secilenTeklifBaslikListesi}">
+                <f:facet name="header">
+                    Satın Alma Teklifleri
+                     <p:commandButton icon="fa fa-refresh" style="float:left"
+                                      value="ERP'den Yenile" update="teklifBasliklariDataTable"
+                                      action="#{satinAlmaBean.satinAlmaTeklifleriniKaydetERPden()}" />
+                    <p:commandButton id="toggler" type="button" value="Sütunlar" style="float:right" icon="fa fa-server" />
+                    <p:columnToggler datasource="teklifBasliklariDataTable" trigger="toggler" />
+                </f:facet>
+                <p:column style="width:30px;text-align:center">
+                    <f:facet name="header">
+                        <h:outputText value="Sıra" />
+                    </f:facet>
+                    <h:outputText 
+                        value="#{index + 1}" />
+                </p:column>
+                <p:column headerText="Seç" selectionMode="multiple" style="width:25px;text-align:center"/>
+                <p:column headerText="Teklif No." sortBy="#{teklifBaslik.TEKLIF_NUMARASI}" style="width:65px;text-align:center"
+                          filterBy="#{teklifBaslik.TEKLIF_NUMARASI}" filterMatchMode="contains">
+                    <h:outputText value="#{teklifBaslik.TEKLIF_NUMARASI}" />
+                </p:column>
+                <p:column headerText="Teklif Ekleyen" sortBy="#{teklifBaslik.SORUMLU_PERSONEL}"
+                          style="width:80px;text-align:center" filterBy="#{teklifBaslik.SORUMLU_PERSONEL}" filterMatchMode="contains">
+                    <h:outputText value="#{teklifBaslik.SORUMLU_PERSONEL}" />
+                </p:column>
+                <p:column headerText="Belge No." sortBy="#{teklifBaslik.BELGE_NO}"
+                          style="width:80px;text-align:center" filterBy="#{teklifBaslik.BELGE_NO}" filterMatchMode="contains">
+                    <h:outputText value="#{teklifBaslik.BELGE_NO}" />
+                </p:column>
+                <p:column headerText="Teklif Tarihi" sortBy="#{teklifBaslik.TEKLIF_TARIHI}"
+                          style="width:80px;text-align:center">
+                    <h:outputText value="#{teklifBaslik.TEKLIF_TARIHI}">
+                        <f:convertDateTime pattern="dd.MM.yyyy" />
+                    </h:outputText>
+                </p:column>        
+                <p:column headerText="Revizyon" sortBy="#{teklifBaslik.GECERLI_TEKLIF_REVIZYON_NUMARASI}"
+                          style="width:55px;text-align:center">
+                    <h:outputText value="#{teklifBaslik.GECERLI_TEKLIF_REVIZYON_NUMARASI}" />
+                </p:column> 
+                <p:column headerText="Tedarikçi" sortBy="#{teklifBaslik.musteriUnvani}" filterBy="#{teklifBaslik.musteriUnvani}" filterMatchMode="contains">
+                    <h:outputText value="#{teklifBaslik.musteriUnvani}" />
+                </p:column>  
+                <p:column style="width:40px;text-align: center" headerText="Detay">
+                    <p:commandButton icon="fa fa-search-plus"
+                                     action="#{satinAlmaBean.satinAlmaTeklifDetaylariniGetirERPdenYeni()}"
+                                     oncomplete="PF('detay').show();" update="detayDialog">
+                       <f:setPropertyActionListener value="#{teklifBaslik}" target="#{satinAlmaBean.secilenTeklifBaslik}" />
+                    </p:commandButton>                    
+                </p:column> 
+                <p:column style="width:50px;text-align: center" headerText="Yanıtlar">
+                    <p:commandButton icon="fa fa-send"
+                                     action="#{satinAlmaBean.satinAlmaYanitlariniGetir()}"
+                                     oncomplete="window.open('/OMS/admin/pages/satinAlmaGonderilenler.jsf')">
+                       <f:setPropertyActionListener value="#{teklifBaslik}" target="#{satinAlmaBean.secilenTeklifBaslik}" />
+                    </p:commandButton>                    
+                </p:column> 
+                <f:facet name="footer">
+                    <p:commandButton process="teklifBasliklariDataTable" icon="fa fa-eye-slash" 
+                                     actionListener="#{satinAlmaBean.satinAlmaTeklifleriniGizleOnIsleme}"
+                                     value="Gizle" action="#{satinAlmaBean.satinAlmaTeklifleriniGizle}"
+                                     update="teklifBasliklariDataTable,satinAlmaTeklifBaslikForm:growl">
+                        <p:confirm header="Gizleme Onayı" icon="fa fa-bell-o"
+                                   message="Gizlemek istediğinizden emin misiniz?"/>
+                    </p:commandButton>
+                    <p:commandButton value="Gizlenenleri Göster" icon="fa fa-eye" onclick="PF('gizlenenler').show();" 
+                                     type="button" action="#{satinAlmaBean.gizlenenSatinAlmaTeklifleriniGetir}"/>                    
+                </f:facet>
+            </p:dataTable>
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">
+                <center>
+                    <p:commandButton value="Evet" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-check"/>
+                    <p:commandButton value="Hayır" type="button" styleClass="ui-confirmdialog-no" icon="fa fa-close" />
+                </center>
+            </p:confirmDialog> 
+        </h:form>
+        
+        <p:dialog header="Gizlenen Satın Alma Teklifleri" widgetVar="gizlenenler" id="gizlenenTeklifBasliklariDialog"
+                  maximizable="true" modal="true" appendTo="@(body)" dynamic="true">
+             <p:ajax event="open" listener="#{satinAlmaBean.gizlenenSatinAlmaTeklifleriniGetir}" update="gizlenenSatinAlmaTeklifBaslikForm"/>
+             <p:ajax event="close" listener="#{satinAlmaBean.gizlenenSatinAlmaTeklifleriniGetir}" update="gizlenenSatinAlmaTeklifBaslikForm"/> 
+               <h:form id="gizlenenSatinAlmaTeklifBaslikForm">
+                <p:dataTable var="gizlenenTeklifBaslik" 
+                     value="#{satinAlmaBean.gizlenenTeklifBasliklari}" 
+                     filteredValue="#{satinAlmaBean.gizlenenTeklifBasliklariFiltreleme}"                                                  
+                     paginator="true" style="font-size:14px;"
+                     paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                     rows="15"
+                     rowsPerPageTemplate="15,30,45"
+                     id="gizlenenTeklifBasliklariDataTable"
+                     draggableColumns="true"
+                     rowIndexVar="index"
+                     rowKey="#{gizlenenTeklifBaslik.TEKLIF_NUMARASI}"
+                     selection="#{satinAlmaBean.secilenGizlenmisTeklifBaslikListesi}">
+                     <f:facet name="header">
+                        Gizlenen Satın Alma Teklifleri                            
+                    </f:facet>
+                    <p:column style="width:30px;text-align:center">
+                        <f:facet name="header">
+                            <h:outputText value="Sıra" />
+                        </f:facet>
+                        <h:outputText 
+                            value="#{index + 1}" />
+                    </p:column>
+                    <p:column headerText="Seç" selectionMode="multiple" style="width:25px;text-align:center"/>
+                    <p:column headerText="Teklif No." sortBy="#{gizlenenTeklifBaslik.TEKLIF_NUMARASI}" style="width:65px;text-align:center"
+                              filterBy="#{gizlenenTeklifBaslik.TEKLIF_NUMARASI}" filterMatchMode="contains">
+                        <h:outputText value="#{gizlenenTeklifBaslik.TEKLIF_NUMARASI}" />
+                    </p:column>                        
+                     <p:column headerText="Teklif Ekleyen" sortBy="#{gizlenenTeklifBaslik.SORUMLU_PERSONEL}"
+                                style="width:80px;text-align:center" filterBy="#{gizlenenTeklifBaslik.SORUMLU_PERSONEL}" filterMatchMode="contains">
+                          <h:outputText value="#{gizlenenTeklifBaslik.SORUMLU_PERSONEL}" />
+                     </p:column>
+                     <p:column headerText="Belge No." sortBy="#{gizlenenTeklifBaslik.BELGE_NO}"
+                                style="width:80px;text-align:center" filterBy="#{gizlenenTeklifBaslik.BELGE_NO}" filterMatchMode="contains">
+                          <h:outputText value="#{gizlenenTeklifBaslik.BELGE_NO}" />
+                     </p:column>
+                     <p:column headerText="Teklif Tarihi" sortBy="#{gizlenenTeklifBaslik.TEKLIF_TARIHI}"
+                                style="width:80px;text-align:center">
+                          <h:outputText value="#{gizlenenTeklifBaslik.TEKLIF_TARIHI}">
+                              <f:convertDateTime pattern="dd.MM.yyyy" />
+                          </h:outputText>
+                     </p:column>        
+                     <p:column headerText="Revizyon" sortBy="#{gizlenenTeklifBaslik.GECERLI_TEKLIF_REVIZYON_NUMARASI}"
+                                style="width:55px;text-align:center">
+                          <h:outputText value="#{gizlenenTeklifBaslik.GECERLI_TEKLIF_REVIZYON_NUMARASI}" />
+                     </p:column> 
+                     <p:column headerText="Tedarikçi" sortBy="#{gizlenenTeklifBaslik.musteriUnvani}" filterBy="#{gizlenenTeklifBaslik.musteriUnvani}" filterMatchMode="contains">
+                          <h:outputText value="#{gizlenenTeklifBaslik.musteriUnvani}" />
+                     </p:column>
+                     <f:facet name="footer">
+                        <p:commandButton process="gizlenenTeklifBasliklariDataTable" icon="fa fa-mail-reply-all" 
+                                         value="Geri Getir" 
+                                         actionListener="#{satinAlmaBean.satinAlmaTeklifleriniGeriGetirOnIsleme}"
+                                         action="#{satinAlmaBean.satinAlmaTeklifleriniGeriGetir}"
+                                         update="gizlenenTeklifBasliklariDataTable,satinAlmaTeklifBaslikForm:growl,satinAlmaTeklifBaslikForm:teklifBasliklariDataTable">
+                            <p:confirm header="Geri getirme Onayı" icon="fa fa-bell-o"
+                            message="Geri getirmek istediğinizden emin misiniz?"/>
+                         </p:commandButton>                  
+                     </f:facet>
+                  </p:dataTable>
+               </h:form>
+        </p:dialog>         
+        
+        <p:dialog   widgetVar="detay"
+                    id="detayDialog"
+                    minimizable="true"
+                    maximizable="true"
+                    modal="true"
+                    appendTo="@(body)"
+                    dynamic="true"
+                    showEffect="fade" 
+                    hideEffect="explode"
+                    header="Teklif No: #{satinAlmaBean.secilenTeklifBaslik.TEKLIF_NUMARASI}">
+                    <p:ajax event="open" 
+                            listener="#{satinAlmaBean.satinAlmaTeklifDetaylariniGetirERPdenYeni()}"
+                            update="satinAlmaDetayYeniForm"/>
+                    <h:form id="satinAlmaDetayYeniForm">
+                       <ui:include src="satinAlmaDetay.xhtml"/>      
+                    </h:form>
+        </p:dialog>
+        <p:dialog   widgetVar="yanitlar"
+                    id="yanitlarDialog"
+                    minimizable="true"
+                    maximizable="true"
+                    modal="true"
+                    appendTo="@(body)"
+                    dynamic="true"
+                    showEffect="fade" 
+                    hideEffect="explode"
+                    header="Teklif No: #{satinAlmaBean.secilenTeklifBaslik.TEKLIF_NUMARASI}">
+                    <p:ajax event="open" 
+                            listener="#{satinAlmaBean.satinAlmaYanitlariniGetirYeni()}"
+                            update="satinAlmaGonderilenMailYeniForm"/>
+                    <h:form id="satinAlmaGonderilenMailYeniForm">
+                       <ui:include src="satinAlmaGonderilenler.xhtml"/>      
+                    </h:form>
+        </p:dialog>
+    </ui:define>
+</ui:composition>
+

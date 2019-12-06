@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en"
+     xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:f="http://java.sun.com/jsf/core"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:p="http://primefaces.org/ui">
+    <style type="text/css">
+        .ui-stack {
+            z-index: 1000;
+        }
+    </style>
+    <link rel="shortcut icon" type="image/x-icon" href="#{request.contextPath}/resources/images/oms.ico"/>
+    <h:head>
+        <title>OMS - Teklif Yönetim Yazılımı</title>
+    </h:head>
+    <p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />
+    <p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+       <img src="../resources/images/ajaxloadingbar.gif" alt=""/>
+    </p:dialog>
+    <h:body>        
+            <p:layout fullPage="true" id="fullLayout">
+                <p:layoutUnit position="center">
+                    <ui:insert name="content">
+
+                    </ui:insert>
+                </p:layoutUnit>
+                
+                <p:layoutUnit position="south" size="40">
+                    <h:outputText value="OMS - Offer Management Software 2019" style="font-size: small"/>                    
+                </p:layoutUnit>
+                
+            </p:layout>
+    </h:body>
+</html>

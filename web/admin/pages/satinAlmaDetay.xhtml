@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en"
+     xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:f="http://java.sun.com/jsf/core"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:p="http://primefaces.org/ui">
+     <style type="text/css">
+            .value {
+                font-weight: bold;
+            }
+
+            .ui-datatable {
+                margin-bottom: 25px
+            }
+
+            .ui-datatable .ui-datatable-footer {
+                text-align:left;
+            }
+
+            .ui-datalist ul {
+                padding: 0 0 0 10px;
+                margin: 5px 0;
+            }
+
+            .ui-datatable .ui-button-icon-only .ui-button-text {
+                padding: 0;
+                line-height: 1.2;
+            }
+
+            .ui-datatable-header {
+                height: 35px
+            }
+
+            .layout-wrapper .topbar {
+                z-index: 10000000;
+            }
+
+            .layout-wrapper .layout-menu {
+                z-index: 9999999;
+            }             
+            .ui-paginator a {
+                margin-right: 5px;
+            }
+        </style>
+    <h:body>
+        <h:form id="satinAlmaTeklifDetayForm">
+          <center>
+            <p:growl id="growl" showDetail="false" sticky="false" escape="false"/>
+            <h:panelGrid columns="2" cellpadding="5" style="alignment-adjust: auto" border="1"> 
+                <p:commandButton disabled="true" value="Tedarikçi Unvanı:" style="color: white; background-color: darkblue;font-size:14px;"/> 
+                <h:outputLabel id="firmaUnvani" value="#{satinAlmaBean.secilenTeklifBaslik.musteriUnvani}" style="font-size:14px;"/>
+            </h:panelGrid>
+            <h:panelGrid columns="8" cellpadding="5" style="alignment-adjust: auto" border="1"> 
+                <p:commandButton value="Teklif No:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/> 
+                <h:outputLabel id="teklifNo" value="#{satinAlmaBean.secilenTeklifBaslik.TEKLIF_NUMARASI}" style="font-size:14px;"/>
+
+                <p:commandButton value="Revizyon No:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/> 
+                <h:outputLabel id="revizyonNo" value="#{satinAlmaBean.secilenTeklifBaslik.GECERLI_TEKLIF_REVIZYON_NUMARASI}" style="font-size:14px;"/>
+
+                <p:commandButton value="Baş. Tar.:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/> 
+                <h:outputLabel id="baslangicTarihi" value="#{satinAlmaBean.secilenTeklifBaslik.TEKLIF_BASLANGIC_TARIHI}" style="font-size:14px;">
+                    <f:convertDateTime pattern="dd.MM.yyyy" />
+                </h:outputLabel>
+
+                <p:commandButton value="Bit. Tar.:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/> 
+                <h:outputLabel id="bitisTarihi" value="#{satinAlmaBean.secilenTeklifBaslik.TEKLIF_BITIS_TARIHI}" style="font-size:14px;">
+                    <f:convertDateTime pattern="dd.MM.yyyy" />
+                </h:outputLabel>                    
+            </h:panelGrid>            
+              <p:commandButton value="Gönder" 
+                               action="#{satinAlmaBean.mailPrepareYeni()}"
+                               icon="fa fa-send" id="gonderButon" 
+                               style="text-align: center; width: 200px;margin-top: 15px;"
+                               oncomplete="PF('gonder').show();" update="gonderDialog"/>
+         </center>
+                <p:dataTable 
+                         var="teklifSatir" value="#{satinAlmaBean.teklifSatirlari}" 
+                         paginator="true"
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rows="15"
+                         rowsPerPageTemplate="15,30,45"
+                         id="teklifSatirlariDataTable"  
+                         draggableColumns="true"
+                         rowIndexVar="index"
+                         rowKey="#{teklifSatir.TEKLIF_SATIR_ID}"
+                         style="margin: 25px;font-size:14px;">
+                    <f:facet name="header">
+                        Teklif Satırları Listesi
+                    </f:facet>
+                    <p:column style="width:25px;text-align:center">
+                        <f:facet name="header">
+                            <h:outputText value="Sıra" />
+                        </f:facet>
+                        <h:outputText value="#{index + 1}" />
+                    </p:column>    
+                    <p:column headerText="Kod" sortBy="#{teklifSatir.MALZEME_HIZMET_MASRAF_KODU}" 
+                              width="80" exportable="false">
+                        <h:outputText value="#{teklifSatir.MALZEME_HIZMET_MASRAF_KODU}"/>
+                    </p:column>
+                    <p:column headerText="Ad" sortBy="#{teklifSatir.MALZEME_HIZMET_MASRAF_ADI}">
+                        <h:outputText value="#{teklifSatir.MALZEME_HIZMET_MASRAF_ADI}"/>
+                    </p:column> 
+                    <p:column headerText="Ad (2)" sortBy="#{teklifSatir.MALZEME_HIZMET_MASRAF_ADI2}">
+                        <h:outputText value="#{teklifSatir.MALZEME_HIZMET_MASRAF_ADI2}"/>
+                    </p:column>
+                    <p:column headerText="Açıklama" sortBy="#{teklifSatir.MALZEME_HIZMET_MASRAF_ACIKLAMASI}">
+                        <h:outputText value="#{teklifSatir.MALZEME_HIZMET_MASRAF_ACIKLAMASI}" />
+                    </p:column>
+                    <p:column headerText="Miktar" sortBy="#{teklifSatir.MALZEME_HIZMET_MASRAF_MIKTARI}" width="100">
+                        <h:outputText value="#{teklifSatir.MALZEME_HIZMET_MASRAF_MIKTARI} #{teklifSatir.MALZEME_HIZMET_MASRAF_BIRIM_KODU}" />
+                    </p:column> 
+                    <p:column headerText="Teslim Tarihi" sortBy="#{teklifSatir.TESLIM_TARIHI}" width="100">
+                        <h:outputLabel value="#{teklifSatir.TESLIM_TARIHI}">
+                            <f:convertDateTime pattern="dd.MM.yyyy" />
+                        </h:outputLabel>
+                    </p:column>
+                </p:dataTable> 
+                <p:dialog   widgetVar="gonder"
+                    id="gonderDialog"
+                    minimizable="true"
+                    maximizable="true"  
+                    dynamic="true"
+                    modal="true"
+                    appendTo="@(body)"
+                    resizable="true"
+                    showEffect="fade" 
+                    hideEffect="explode"
+                    header="Teklif No: #{satinAlmaBean.secilenTeklifBaslik.TEKLIF_NUMARASI}">
+                    <p:ajax event="open" listener="#{satinAlmaBean.mailPrepareYeni()}" 
+                            update="satinAlmaDetayGonderForm"/>
+                    <h:form id="satinAlmaDetayGonderForm" enctype="multipart/form-data"  prependId="false">                       
+                        <ui:include src="satinAlmaDetayGonder.xhtml"/>                    
+                    </h:form>
+                </p:dialog>
+        </h:form>
+    </h:body>
+</html>

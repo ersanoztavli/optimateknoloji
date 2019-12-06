@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en"
+     xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:f="http://java.sun.com/jsf/core"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:p="http://primefaces.org/ui">   
+    <link rel="shortcut icon" type="image/x-icon" href="#{request.contextPath}/resources/images/oms.ico"/>
+    <h:head>
+        <title>OMS - Teklif Yönetim Yazılımı</title>
+    </h:head>
+    <p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />
+    <p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+       <img src="../../resources/images/ajaxloadingbar.gif" alt=""/>
+    </p:dialog>
+    <h:body>        
+        <p:layout fullPage="true"> 
+            <p:layoutUnit position="north" size="66">
+                <h:form style="text-align: right" id="centerForm">
+                     <p:menubar>
+                        <p:menuitem value="Ana Sayfa" url="welcomeAdmin.jsf" icon="fa fa-home" />   
+                        <p:menuitem value="Satış" url="satis.jsf" icon="fa fa-mail-forward" />                     
+                        <p:menuitem value="Satın Alma" url="satinAlma.jsf" icon="fa fa-mail-reply-all" />
+                        <p:menuitem value="Ayarlar" url="ayarlar.jsf" icon="fa fa-wrench" />                     
+                        <p:menuitem value="Ön Değerler" url="onDegerler.jsf" icon="fa fa-pencil-square-o" />
+                        <f:facet name="options">
+                            <h:outputText value="#{sessionBean.kullanici.AD}" style="font-size: medium; color: red"/>
+                            <h:outputText value="#{sessionBean.kullanici.SOYAD}" style="margin-left: 5px; margin-right: 5px;font-size: medium; color: red"/>
+                            <p:commandButton value="Çıkış" icon="fa fa-sign-out" action="#{sessionBean.logout()}" >
+                                <p:confirm header="Çıkış Onayı" message="Çıkmak istediğinizden emin misiniz?" icon="fa fa-bell-o" />
+                            </p:commandButton>
+                        </f:facet>
+                    </p:menubar>
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">
+                        <center>
+                            <p:commandButton value="Evet" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-check" />
+                            <p:commandButton value="Hayır" type="button" styleClass="ui-confirmdialog-no" icon="fa fa-close" />
+                        </center>
+                    </p:confirmDialog>
+                </h:form>
+            </p:layoutUnit>
+            <p:layoutUnit position="center">                                
+                <ui:insert name="content">
+
+                </ui:insert>
+            </p:layoutUnit>
+            <p:layoutUnit position="south" size="34">               
+               <img src="../../resources/images/optimaKucuk.jpeg" alt="" style="float: left; width: 120px; height: 20px"/>
+               <h:outputText value="OMS - Teklif Yönetim Yazılımı 2019" style="float: left;font-size: x-small; margin-top: 3px;margin-left: 10px" />
+               <h:outputText value=" (#{sessionBean.kullanici.ERP_ON_DEGER_FIRMA_NUMBER}) - #{sessionBean.kullanici.ERP_ON_DEGER_FIRMA_UNVAN}" style="float: right;font-size: small"/>
+               <h:outputText value="ERP Firma:" style="float: right;font-size: small; color: red"/>
+               <h:outputText value=" #{sessionBean.kullanici.ON_DEGER_FIRMA_UNVAN}" style="float: right;font-size: small; margin-right: 10px "/>
+               <h:outputText value="OMS Firma:" style="float: right;font-size: small; color: red"/>
+            </p:layoutUnit>
+        </p:layout>
+    </h:body>
+</html>

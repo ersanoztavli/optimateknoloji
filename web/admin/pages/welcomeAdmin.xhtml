@@ -1,0 +1,151 @@
+<ui:composition template="templateAdmin.xhtml"
+     xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:f="http://java.sun.com/jsf/core"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:p="http://primefaces.org/ui">    
+    <ui:define name="content">
+        <style type="text/css">
+            .value {
+                font-weight: bold;
+            }
+
+            .ui-datatable {
+                margin-bottom: 25px
+            }
+
+            .ui-datatable .ui-datatable-footer {
+                text-align:left;
+            }
+
+            .ui-datalist ul {
+                padding: 0 0 0 10px;
+                margin: 5px 0;
+            }
+
+            .ui-datatable .ui-button-icon-only .ui-button-text {
+                padding: 0;
+                line-height: 1.2;
+            }
+            
+            .ui-datatable-header {
+                height: 35px
+            }
+            
+            .layout-wrapper .topbar {
+                z-index: 10000000;
+             }
+
+             .layout-wrapper .layout-menu {
+                z-index: 9999999;
+             }
+            .ui-paginator a {
+                margin-right: 5px;
+            }       
+            .green {
+                background-image: none !important;
+                color: green !important;
+            }
+            .red {
+                background-image: none !important;
+                color: orange !important;
+            }
+        </style>
+        <p:breadCrumb>
+                <p:menuitem value="Ana Sayfa" url="/admin/pages/welcomeAdmin.jsf" />
+                <p:menuitem value="Ana Sayfa" url="/admin/pages/welcomeAdmin.jsf" />
+        </p:breadCrumb>
+        <p:tabView dynamic="true" cache="false">
+            <p:tab title="Teklifler (10 Gün - Detaylı)">
+                <p:dataTable var="detayliHareket" value="#{welcomeAdminBean.sonDetayliHareketlerList}"
+                             style="font-size:14px;">
+                    <p:column headerText="Teklif No." style="width:65px;text-align:center">
+                        <h:outputText value="#{detayliHareket.teklifNo}" />
+                    </p:column>
+                    <p:column headerText="Tarih" style="width:80px;text-align:center">
+                        <h:outputText value="#{detayliHareket.teklifTarihi}" >
+                            <f:convertDateTime pattern="dd.MM.yyyy"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Cari">
+                        <h:outputText value="#{detayliHareket.teklifCariKod}-#{detayliHareket.teklifCariUnvan}" />
+                    </p:column>
+                    <p:column headerText="Teklif Tutarı"
+                              style="width:100px;text-align:center" >
+                          <h:outputText value="#{detayliHareket.teklifTutari}"
+                                        rendered="#{detayliHareket.doviz=='USD'}"
+                                        style="font-weight: bold">
+                              <f:convertNumber type="currency" currencySymbol="$" locale="tr"/>
+                          </h:outputText>
+                          <h:outputText value="#{detayliHareket.teklifTutari}"
+                                        rendered="#{detayliHareket.doviz=='EUR'}"
+                                        style="font-weight: bold">
+                              <f:convertNumber type="currency" currencySymbol="€" locale="tr"/>
+                          </h:outputText>
+                          <h:outputText value="#{detayliHareket.teklifTutari}"
+                                        rendered="#{detayliHareket.doviz=='TL'}"
+                                        style="font-weight: bold">
+                              <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                          </h:outputText>
+                    </p:column> 
+                    <p:column headerText="Teklif Miktarı">
+                        <h:outputText value="#{detayliHareket.teklifMiktari}" />
+                    </p:column>
+                    <p:column headerText="Sipariş Miktarı">
+                        <h:outputText value="#{detayliHareket.siparisMiktari}" />
+                    </p:column>
+                    <p:column headerText="Sipariş Durumu">
+                        <h:outputText value="#{detayliHareket.siparisDurumu}" 
+                                      styleClass="#{detayliHareket.siparisDurumu eq 'SİPARİŞ OLMADI' ? 'red' : 
+                                                    detayliHareket.siparisDurumu eq 'SİPARİŞ' ? 'green' : null}"/>
+                    </p:column>
+                </p:dataTable>
+            </p:tab>
+            <p:tab title="Teklifler (7 Gün)">
+                <p:dataTable var="hareket" value="#{welcomeAdminBean.sonHareketlerList}"
+                             style="font-size:14px;">
+                    <p:column headerText="Tarih">
+                        <h:outputText value="#{hareket.teklifGun}">
+                             <f:convertDateTime pattern="dd.MM.yyyy"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Teklif Adet">
+                        <h:outputText value="#{hareket.teklifAdeti}" />
+                    </p:column>
+                    <p:column headerText="Teklif Miktarı">
+                        <h:outputText value="#{hareket.toplamTeklifMiktari}" />
+                    </p:column>
+                    <p:column headerText="Siparişe Dönüşen">
+                        <h:outputText value="#{hareket.sipariseDonusmus}" />
+                    </p:column>
+                    <p:column headerText="Siparişe Dönüşmeyen">
+                        <h:outputText value="#{hareket.sipariseDonusmemis}" />
+                    </p:column>
+                </p:dataTable>
+            </p:tab>
+            <p:tab title="Yıl Bazında">
+                <h:panelGrid columns="2" columnClasses="left,right" style="width:100%">            
+                    <p:chart type="bar" model="#{welcomeAdminBean.barModel2}"/>
+                    <p:chart type="bar" model="#{welcomeAdminBean.barModel1}"/>
+                </h:panelGrid>
+            </p:tab>
+            <p:tab title="Ay Bazında">
+                <h:panelGrid columns="2" columnClasses="left,right" style="width:100%" cellspacing="15">
+                    <p:chart type="line" model="#{welcomeAdminBean.lineModel1}"/>
+                    <p:chart type="line" model="#{welcomeAdminBean.lineModel2}"/>            
+                    <p:chart type="line" model="#{welcomeAdminBean.lineModel3}"/>
+                    <p:chart type="line" model="#{welcomeAdminBean.lineModel4}"/>
+                </h:panelGrid>
+            </p:tab>
+            <p:tab title="Gün Bazında">
+                <h:panelGrid columns="2" columnClasses="left,right" style="width:100%">
+                    <p:chart type="pie" model="#{welcomeAdminBean.pieModel1}" />
+                    <p:chart type="bar" model="#{welcomeAdminBean.pieModelToBarModel2}"/>
+                    <p:chart type="pie" model="#{welcomeAdminBean.pieModel3}" />
+                    <p:chart type="bar" model="#{welcomeAdminBean.pieModelToBarModel4}"/>
+                </h:panelGrid>
+            </p:tab>
+        </p:tabView>  
+    </ui:define>
+</ui:composition>
+

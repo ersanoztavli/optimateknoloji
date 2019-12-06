@@ -1,0 +1,226 @@
+<ui:composition template="templateUser.xhtml"
+     xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:f="http://java.sun.com/jsf/core"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:p="http://primefaces.org/ui"> 
+    <f:metadata>
+        <f:viewParam name="guid" value="#{offerUserBean.guid}"/>
+        <f:event type="preRenderView" listener="#{offerUserBean.ilkCalisan}"/>
+    </f:metadata>
+    <ui:define name="content">
+        <style type="text/css">
+            .value {
+                font-weight: bold;
+            }
+
+            .ui-datatable {
+                margin-bottom: 25px
+            }
+
+            .ui-datatable .ui-datatable-footer {
+                text-align:left;
+            }
+
+            .ui-datalist ul {
+                padding: 0 0 0 10px;
+                margin: 5px 0;
+            }
+
+            .ui-datatable .ui-button-icon-only .ui-button-text {
+                padding: 0;
+                line-height: 1.2;
+            }
+            
+            .ui-datatable-header {
+                height: 35px
+            }
+            
+            .layout-wrapper .topbar {
+                z-index: 10000000;
+             }
+
+             .layout-wrapper .layout-menu {
+                z-index: 9999999;
+             }
+            
+            .blue {
+                background-image: none !important;
+                color: blue !important;
+            }
+            .green {
+                background-image: none !important;
+                color: green !important;
+            }
+            .red {
+                background-image: none !important;
+                color: orange !important;
+            }
+            .purple {
+                background-image: none !important;
+                color: purple !important;
+            }
+        </style>
+            <h:form style="text-align: right" id="form">
+            <p:growl id="growl" showDetail="false" sticky="false" escape="false"/> 
+            <center>
+                <h:panelGrid columns="4" cellpadding="5" style="alignment-adjust: auto"> 
+                        <p:commandButton value="Firma Unvanı:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/> 
+                        <h:outputLabel id="firmaUnvani" value="#{offerUserBean.teklifBaslik.firmaUnvan}" style="font-size:14px;"/>
+
+                        <p:commandButton value="Müşteri Unvanı:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/> 
+                        <h:outputLabel id="musteriUnvani" value="#{offerUserBean.teklifBaslik.musteriUnvani}" style="font-size:14px;"/>
+                </h:panelGrid>
+                <h:panelGrid columns="8" cellpadding="5" style="alignment-adjust: auto" id="panelGrid">                    
+                    <p:commandButton value="Teklif No:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/> 
+                    <h:outputLabel id="teklifNo" value="#{offerUserBean.teklifBaslik.TEKLIF_NUMARASI}" style="font-size:14px;"/>
+                    
+                    <p:commandButton value="Baş. Tar.:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/> 
+                    <h:outputLabel id="baslangicTarihi" value="#{offerUserBean.teklifBaslik.TEKLIF_BASLANGIC_TARIHI}" style="font-size:14px;">
+                        <f:convertDateTime pattern="dd.MM.yyyy" />
+                    </h:outputLabel>
+                    
+                    <p:commandButton value="Toplam Tutar:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/> 
+                    <h:outputLabel id="toplamTutar" value="#{offerUserBean.teklifBaslik.TEKLIF_TUTARI}" style="font-size:14px;">
+                        <f:convertNumber type="currency" currencySymbol=""/>
+                    </h:outputLabel>
+                    
+                    <p:commandButton value="Para Birimi:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/> 
+                    <h:outputLabel id="paraBirimi" style="font-size:14px;"
+                                   value="#{offerUserBean.teklifBaslik.TEKLIF_PARA_BIRIMI eq 1 ? 'USD' : offerUserBean.teklifBaslik.TEKLIF_PARA_BIRIMI eq 20 ? 'EUR' : offerUserBean.teklifBaslik.TEKLIF_PARA_BIRIMI eq 0 ? 'TL' : ''}"/>
+                    
+                    <p:commandButton value="Revizyon No:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/> 
+                    <h:outputLabel id="revizyonNo" value="#{offerUserBean.teklifBaslik.GECERLI_TEKLIF_REVIZYON_NUMARASI}" style="font-size:14px;"/>
+                                     
+                    <p:commandButton value="Bit. Tar.:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/> 
+                    <h:outputLabel id="bitisTarihi" value="#{offerUserBean.teklifBaslik.TEKLIF_BITIS_TARIHI}" style="font-size:14px;">
+                        <f:convertDateTime pattern="dd.MM.yyyy" />
+                    </h:outputLabel>
+                    
+                    <p:commandButton value="Kur:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/> 
+                    <h:outputLabel id="kur" value="#{offerUserBean.teklifBaslik.TEKLIF_KUR}" style="font-size:14px;">
+                        <f:convertNumber type="currency" currencySymbol=""/>
+                    </h:outputLabel>
+                    
+                    <p:commandButton value="Durumu:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/> 
+                    <h:outputLabel id="durumu" value="#{offerUserBean.teklifBaslik.TEKLIF_DURUM_KODU_ACIKLAMA}" 
+                                   style="font-size:14px;"
+                                   styleClass="#{offerUserBean.teklifBaslik.TEKLIF_DURUM_KODU eq 98 ? 'red' : 
+                                                      offerUserBean.teklifBaslik.TEKLIF_DURUM_KODU eq 1 ? 'blue' : 
+                                                          offerUserBean.teklifBaslik.TEKLIF_DURUM_KODU eq 99 ? 'green' : 
+                                                             offerUserBean.teklifBaslik.TEKLIF_DURUM_KODU eq 96 ? 'purple' : null}"/>                    
+                </h:panelGrid>
+                <p:inputTextarea value="#{offerUserBean.teklifBaslik.MUSTERI_YANIT}" autoResize="true" maxlength="999"
+                                 style="width: 50%; height: auto;margin-top: 15px;" disabled="#{offerUserBean.disabled}"
+                                 placeholder="Teklif ile ilgili açıklamalarınızı giriniz..."/>
+                <h:panelGrid columns="6" cellpadding="5" style="text-align: center;font-size: 14px;"> 
+                    <f:facet name="footer">
+                        <p:commandButton value="Kabul Et" action="#{offerUserBean.kabulEt()}"
+                                         icon="fa fa-thumbs-up" update="@form" disabled="#{offerUserBean.disabled}"/>
+                        <p:commandButton value="Reddet" action="#{offerUserBean.reddet()}" 
+                                         disabled="#{offerUserBean.disabled}"
+                                         icon="fa fa-thumbs-down" update="@form" style="margin-left: 5px"/>
+                        <p:commandButton value="Revizyon Talep Et" action="#{offerUserBean.revizyonTalepEt()}"
+                                         icon="fa fa-exchange" update="@form" style="margin-left: 5px"
+                                         disabled="#{offerUserBean.disabled}"/>
+                    </f:facet>
+                </h:panelGrid>
+                <p:remoteCommand name="refresh" update="@([id$=tutarKolon1]) @([id$=tutarKolon2]) @([id$=tutarKolon3])
+                                                        @([id$=tutarKolon4]) @([id$=tutarKolon5]) @([id$=tutarKolon6]) @([id$=tutarKolon7])"/>
+                <p:dataTable 
+                         var="teklifSatir" value="#{offerUserBean.teklifSatirlari}" 
+                         id="teklifSatirlariDataTable" 
+                         editable="true" editMode="cell"
+                         draggableColumns="true"
+                         rowIndexVar="index"
+                         rowKey="#{teklifSatir.TEKLIF_SATIR_ID}"
+                         paginator="true" rows="50" 
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                         style="font-size:14px;">
+                    <f:facet name="header">
+                        Teklif Satırları Listesi
+                        <div style="float:right">
+                            <p:commandButton icon="fa fa-download" ajax="false"
+                                      value="PDF İndir" action="#{offerUserBean.downloadPdf()}" />
+                            
+                            <p:commandButton icon="fa fa-download" ajax="false"
+                                      value="Excel İndir" action="#{offerUserBean.downloadXlsx()}" />
+                        </div>
+                    </f:facet>
+                    <p:ajax event="cellEdit" listener="#{offerUserBean.musteriMiktarDegisti(teklifSatir)}" 
+                            update=":form:panelGrid" oncomplete="refresh();"/>
+                    <p:column style="width:25px;text-align:center">
+                        <f:facet name="header">
+                            <h:outputText value="Sıra" />
+                        </f:facet>
+                        <h:outputText value="#{index + 1}" />
+                    </p:column>     
+                    <p:column headerText="Kod" sortBy="#{teklifSatir.MALZEME_HIZMET_MASRAF_KODU}" width="70">
+                        <h:outputText value="#{teklifSatir.MALZEME_HIZMET_MASRAF_KODU}"/>
+                    </p:column>
+                    <p:column headerText="Ad" sortBy="#{teklifSatir.MALZEME_HIZMET_MASRAF_ADI}">
+                        <h:outputText value="#{teklifSatir.MALZEME_HIZMET_MASRAF_ADI}"/>
+                    </p:column>
+                    <p:column headerText="Ad2" sortBy="#{teklifSatir.MALZEME_HIZMET_MASRAF_ADI2}">
+                        <h:outputText value="#{teklifSatir.MALZEME_HIZMET_MASRAF_ADI2}"/>
+                    </p:column> 
+                    <p:column headerText="Açıklama" sortBy="#{teklifSatir.MALZEME_HIZMET_MASRAF_ACIKLAMASI}">
+                        <h:outputText value="#{teklifSatir.MALZEME_HIZMET_MASRAF_ACIKLAMASI}" />
+                    </p:column>
+                    <p:column headerText="Miktar" sortBy="#{teklifSatir.MALZEME_HIZMET_MASRAF_MIKTARI}" width="105">
+                        <h:outputText value="#{teklifSatir.MALZEME_HIZMET_MASRAF_MIKTARI} #{teklifSatir.MALZEME_HIZMET_MASRAF_BIRIM_KODU.subSequence(0, 3)}" />
+                    </p:column>
+                    <p:column headerText="Miktar (Müşteri)" sortBy="#{teklifSatir.MUSTERI_SATIS_MIKTAR_YANIT}" width="85">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{teklifSatir.MUSTERI_SATIS_MIKTAR_YANIT}"/></f:facet>
+                            <f:facet name="input"><p:inputText value="#{teklifSatir.MUSTERI_SATIS_MIKTAR_YANIT}" disabled="#{offerUserBean.disabled}"/></f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    <p:column headerText="Birim Fiyat" sortBy="#{teklifSatir.MALZEME_HIZMET_MASRAF_BIRIM_FIYATI}" width="50">
+                        <h:outputText value="#{teklifSatir.MALZEME_HIZMET_MASRAF_BIRIM_FIYATI}" >
+                            <f:convertNumber type="currency" currencySymbol=""/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Tutar" width="100">                    
+                        <h:outputText value="#{teklifSatir.MALZEME_HIZMET_MASRAF_BIRIM_FIYATI 
+                                               * teklifSatir.MUSTERI_SATIS_MIKTAR_YANIT}"
+                                      rendered="#{teklifSatir.PARA_BIRIMI == 0}" id="tutarKolon1">
+                            <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                        </h:outputText>
+                        <h:outputText value="#{teklifSatir.MALZEME_HIZMET_MASRAF_BIRIM_FIYATI 
+                                               * teklifSatir.MUSTERI_SATIS_MIKTAR_YANIT}"
+                                      rendered="#{teklifSatir.PARA_BIRIMI == 1}" id="tutarKolon2">
+                            <f:convertNumber type="currency" currencySymbol="$" locale="tr"/>
+                        </h:outputText>
+                        <h:outputText value="#{teklifSatir.MALZEME_HIZMET_MASRAF_BIRIM_FIYATI 
+                                               * teklifSatir.MUSTERI_SATIS_MIKTAR_YANIT}"
+                                      rendered="#{teklifSatir.PARA_BIRIMI == 20}" id="tutarKolon3">
+                            <f:convertNumber type="currency" currencySymbol="€" locale="tr"/>
+                        </h:outputText>
+                        <h:outputText value=" "/>
+                        <h:outputText value="#{teklifSatir.MALZEME_HIZMET_MASRAF_BIRIM_FIYATI 
+                                               * teklifSatir.MUSTERI_SATIS_MIKTAR_YANIT 
+                                               * teklifSatir.KUR}"
+                                      rendered="#{teklifSatir.PARA_BIRIMI == 1}" id="tutarKolon4">
+                            <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                        </h:outputText>
+                        <h:outputText  value="#{teklifSatir.MALZEME_HIZMET_MASRAF_BIRIM_FIYATI 
+                                               * teklifSatir.MUSTERI_SATIS_MIKTAR_YANIT 
+                                               * teklifSatir.KUR}"
+                                      rendered="#{teklifSatir.PARA_BIRIMI == 20}" id="tutarKolon5">
+                            <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                        </h:outputText>
+                        <h:outputText value=" "/>
+                        <h:outputText value="Kur: #{teklifSatir.KUR}"
+                                      rendered="#{teklifSatir.PARA_BIRIMI == 1}" id="tutarKolon6">
+                        </h:outputText>
+                        <h:outputText value="Kur: #{teklifSatir.KUR}"
+                                      rendered="#{teklifSatir.PARA_BIRIMI == 20}" id="tutarKolon7">
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+            </center>
+        </h:form>
+    </ui:define>
+</ui:composition>
+

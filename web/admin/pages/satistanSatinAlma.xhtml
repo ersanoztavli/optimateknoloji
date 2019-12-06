@@ -1,0 +1,183 @@
+<ui:composition template="templateAdmin.xhtml"
+     xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:f="http://java.sun.com/jsf/core"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:p="http://primefaces.org/ui">    
+    <ui:define name="content">
+        <style type="text/css">
+            .value {
+                font-weight: bold;
+            }
+
+            .ui-datatable {
+                margin-bottom: 25px
+            }
+
+            .ui-datatable .ui-datatable-footer {
+                text-align:left;
+            }
+
+            .ui-datalist ul {
+                padding: 0 0 0 10px;
+                margin: 5px 0;
+            }
+
+            .ui-datatable .ui-button-icon-only .ui-button-text {
+                padding: 0;
+                line-height: 1.2;
+            }
+            
+            .ui-datatable-header {
+                height: 35px
+            }
+            
+            .layout-wrapper .topbar {
+                z-index: 10000000;
+             }
+
+             .layout-wrapper .layout-menu {
+                z-index: 9999999;
+             }
+            .ui-paginator a {
+                margin-right: 5px;
+            }
+        </style> 
+        <p:breadCrumb id="breadCrumb">
+                <p:menuitem value="Ana Sayfa" url="/admin/pages/welcomeAdmin.jsf" />
+                <p:menuitem value="Satış" url="/admin/pages/satis.jsf" />
+                <p:menuitem value="Teklif Detay" url="/admin/pages/satisDetay.jsf" />
+                <p:menuitem value="Satın Alma Teklifi Gönder" url="/admin/pages/satistanSatinAlma.jsf" />
+        </p:breadCrumb> 
+        <h:form id="satistanSatinAlmaTeklifleriForm" enctype="multipart/form-data"  prependId="false">
+            <p:growl id="growl" showDetail="false" sticky="false" escape="false"/>
+            <center>
+                <p:commandButton value="Gönder" action="#{satisBean.mailGonderTedarikcilere()}"
+                             icon="fa fa-send" id="satinAlmaTeklifiGonderButon" update="growl"
+                             style="text-align: center; width: 200px; margin: 15px;">
+                    <p:confirm header="Mail Gönderme Onayı" message="Mail göndermek istediğinizden emin misiniz?" icon="fa fa-bell-o" />
+                </p:commandButton>
+                <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">
+                    <center>
+                        <p:commandButton value="Evet" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-check" />
+                        <p:commandButton value="Hayır" type="button" styleClass="ui-confirmdialog-no" icon="fa fa-close" />
+                    </center>
+                </p:confirmDialog>
+            </center>        
+            <p:repeat value="#{satisBean.satisSatiriAtanmisTedarikciList}" 
+                      var="satisSatiriAtanmisTedarikci" id="repeater">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-4">
+                        <div class="ui-g" style="font-size: 14px;">
+                            <div class="ui-g-3">
+                                <h:outputLabel value="Tedarikçi:" style="font-weight: bold"/>
+                            </div>
+                            <div class="ui-g-9">
+                                <p:inplace>
+                                    <p:inputText id="tedarikciUnvani" style="width: 100%" 
+                                                 value="#{satisSatiriAtanmisTedarikci.tedarikciUnvan}"/>
+                                </p:inplace> 
+                            </div>
+                        </div>
+                        <div class="ui-g" style="font-size: 14px;">
+                            <div class="ui-g-3">
+                                <h:outputLabel value="Kimden:" style="font-weight: bold"/>
+                            </div>
+                            <div class="ui-g-9">
+                                <p:inplace>
+                                    <p:inputText id="kimden" style="width: 100%" 
+                                                 value="#{satisSatiriAtanmisTedarikci.mailGonderen}"/>
+                                </p:inplace> 
+                            </div>
+                        </div>
+                        <div class="ui-g" style="font-size: 14px">
+                            <div class="ui-g-3">
+                                <h:outputLabel value="Konu:" style="font-weight: bold"/>
+                            </div>
+                            <div class="ui-g-9">
+                                <p:inputText id="konu" style="width: 100%"
+                                             value="#{satisSatiriAtanmisTedarikci.mailKonu}"/>                                
+                            </div>
+                        </div>
+                        <div class="ui-g" style="font-size: 14px">
+                            <div class="ui-g-3">
+                                <h:outputLabel value="İçerik:" style="font-weight: bold"/>
+                            </div>
+                            <div class="ui-g-9">
+                                <p:inputTextarea id="icerik" style="width: 100%; height: 100%"
+                                                 value="#{satisSatiriAtanmisTedarikci.mailIcerik}"/>
+                            </div>
+                        </div>
+                        <p:commandButton update="@form" 
+                                    actionListener="#{satisBean.digerlerineUygula(satisSatiriAtanmisTedarikci)}"
+                                    icon="fa fa-pagelines" id="digerlerineUygulaKonu"
+                                    style="text-align: center;font-size: 14px;"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-4">
+                        <div class="ui-g" style="font-size: 14px;">
+                            <p:dataTable var="mailTo" value="#{satisSatiriAtanmisTedarikci.mailToList}" 
+                                         editable="true" editMode="cell" id="mailToDataTable" style="font-size: 14px;">
+                                <f:facet name="header">Kime</f:facet>
+                                <p:column headerText="Adres">
+                                    <p:cellEditor>
+                                        <f:facet name="output"><h:outputText value="#{mailTo.mailAdress}"/></f:facet>
+                                        <f:facet name="input"><p:inputText value="#{mailTo.mailAdress}" style="width:100%"/></f:facet>
+                                    </p:cellEditor>                        
+                                </p:column>
+                                <p:column style="width:35px;text-align: center" headerText="Sil">
+                                    <p:commandButton update="mailToDataTable" icon="fa fa-trash-o"
+                                                     action="#{satisBean.silMailTo()}" process="mailToDataTable">
+                                        <f:setPropertyActionListener value="#{satisSatiriAtanmisTedarikci}" target="#{satisBean.islemYapilanSatisSatiriAtanmisTedarikci}" />
+                                        <f:setPropertyActionListener value="#{mailTo}" target="#{satisBean.islemYapilanMailTo}" />
+                                    </p:commandButton>
+                                </p:column>                                
+                                <f:facet name="footer">
+                                    <p:inputText style="width: 60%" value="#{satisBean.eklenecekMailTo.mailAdress}" 
+                                                 placeholder="Adres" id="mailToAdres" />
+                                    <p:commandButton value="Kaydet" process="mailToDataTable"
+                                                     update="mailToDataTable" icon="fa fa-floppy-o" 
+                                                     action="#{satisBean.kaydetYeniMailTo()}"
+                                                     style="width: 30%;margin-left: 5px;">
+                                        <f:setPropertyActionListener value="#{satisSatiriAtanmisTedarikci}" target="#{satisBean.islemYapilanSatisSatiriAtanmisTedarikci}" />
+                                    </p:commandButton>
+                                </f:facet> 
+                            </p:dataTable>
+                        </div>                        
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-4">
+                        <div class="ui-g" style="font-size: 14px;">
+                            <p:dataTable var="mailDosya" value="#{satisSatiriAtanmisTedarikci.mailDosyaList}" 
+                                         id="mailDosyaDataTable" style="font-size: 14px;"
+                                         rowKey="#{mailDosya.mailDosyaAdiUzun}">
+                                <f:facet name="header">Ekler</f:facet>                            
+                                <p:column headerText="Dosya Adı">
+                                    <h:outputText value="#{mailDosya.MAIL_DOSYA_ADI}" />
+                                </p:column>
+                                <p:column headerText="Dosya Boyutu">
+                                    <h:outputText value="#{mailDosya.boyut}" />
+                                </p:column>  
+                                <p:column style="width:60px;text-align: center" headerText="Sil">
+                                    <p:commandButton update="mailDosyaDataTable" icon="fa fa-trash-o"
+                                                     action="#{satisBean.silMailDosyaSatinAlma}" process="mailDosyaDataTable">
+                                        <f:setPropertyActionListener value="#{satisSatiriAtanmisTedarikci}" target="#{satisBean.islemYapilanSatisSatiriAtanmisTedarikci}" />
+                                        <f:setPropertyActionListener value="#{mailDosya}" target="#{satisBean.islemYapilanMailDosya}" />
+                                    </p:commandButton>
+                                </p:column>
+                            </p:dataTable>
+                        </div>
+                        <div class="ui-g" style="font-size: 14px;">
+                            <p:fileUpload auto="false" fileUploadListener="#{satisBean.kaydetYeniDosyaSatinAlma}"
+                                          mode="advanced" dragDropSupport="true" label="Dosya Seç" multiple="true"
+                                          uploadLabel="Yükle" cancelLabel="Sil" update="mailDosyaDataTable" previewWidth="40"
+                                          style="font-size: 10px;width: 100%">
+                                          <f:attribute name="satisSatiriAtanmisTedarikci" value="#{satisSatiriAtanmisTedarikci}" />
+                            </p:fileUpload>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+            </p:repeat>
+            
+        </h:form>
+    </ui:define>
+</ui:composition>

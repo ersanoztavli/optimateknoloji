@@ -1,0 +1,331 @@
+<ui:composition template="templateAdmin.xhtml"
+     xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:f="http://java.sun.com/jsf/core"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:p="http://primefaces.org/ui">    
+    <ui:define name="content">       
+            <p:breadCrumb>
+                <p:menuitem value="Ana Sayfa" url="/admin/pages/welcomeAdmin.jsf" />
+                <p:menuitem value="Ön Değerler" url="/admin/pages/onDegerler.jsf" />
+            </p:breadCrumb>
+            <p:tabView id="tabView" style="height: auto;">
+                <p:ajax event="tabChange" listener="#{onDegerlerBean.onTabChange}" update="kullaniciForm"/>
+                <p:tab title="Kullanıcı">
+                    <h:form id="kullaniciForm">
+                        <p:growl id="growl" showDetail="false" sticky="false" escape="false"/> 
+                        <p:fieldset id="kullaniciEkleFieldSet" collapsed="true" legend="Kullanıcı Ekle" 
+                                    toggleable="true" toggleSpeed="500">                            
+                            <h:panelGrid columns="3" cellpadding="5" style="font-size: 14px">            
+                                <h:outputLabel for="kullaniciAdi" value="Kullanıcı Adı:" /> 
+                                <p:inputText id="kullaniciAdi" value="#{onDegerlerBean.eklenecekYeniKullanici.KULLANICI_ADI}" 
+                                             style="width:300px" required="true" requiredMessage="Lütfen kullanıcı adınızı giriniz!"
+                                             placeholder="Kullanıcı Adı"/>
+                                <p:message for="kullaniciAdi" />
+
+                                <h:outputLabel for="sifre" value="Şifre:" /> 
+                                <p:password id="sifre" value="#{onDegerlerBean.eklenecekYeniKullanici.SIFRE}" 
+                                            style="width:300px" required="true" requiredMessage="Lütfen şifrenizi giriniz!"
+                                            placeholder="Şifre" redisplay="true" />
+                                <p:message for="sifre" />
+
+                                <h:outputLabel for="ad" value="Ad:" /> 
+                                <p:inputText id="ad" value="#{onDegerlerBean.eklenecekYeniKullanici.AD}" 
+                                             style="width:300px" required="true" requiredMessage="Lütfen adınızı giriniz!"
+                                             placeholder="Ad"/>
+                                <p:message for="ad" />
+
+                                <h:outputLabel for="soyad" value="Soyad:" /> 
+                                <p:inputText id="soyad" value="#{onDegerlerBean.eklenecekYeniKullanici.SOYAD}" 
+                                             style="width:300px" required="true" requiredMessage="Lütfen soyadınızı giriniz!"
+                                             placeholder="Soyad"/>
+                                <p:message for="soyad" />
+                                
+                                <h:outputLabel for="kullaniciEmail" value="E-mail:" /> 
+                                <p:inputText id="kullaniciEmail" value="#{onDegerlerBean.eklenecekYeniKullanici.MAIL_ADRESI}" 
+                                             style="width:300px" required="true" requiredMessage="Lütfen e-mail'inizi giriniz!"
+                                             placeholder="E-mail"/>
+                                <p:message for="kullaniciEmail" />
+
+                                <h:outputLabel for="onDegerFirma" value="Ön Değer Firma:" />
+                                <p:selectOneMenu id="onDegerFirma" value="#{onDegerlerBean.eklenecekYeniKullanici.ON_DEGER_FIRMA_ID}" 
+                                                 style="width:270px" required="true" requiredMessage="Lütfen ön değer firma seçiniz!">
+                                <f:selectItem itemLabel="Seçiniz" itemValue="#{null}" />
+                                <f:selectItems value="#{onDegerlerBean.kullaniciFirmalari}" 
+                                               var="firma" itemLabel="#{firma.FIRMA_UNVANI}" 
+                                               itemValue="#{firma.FIRMA_ID}" />
+                                </p:selectOneMenu>
+                                <p:message for="onDegerFirma" />
+                                
+                                <h:outputLabel for="onDegerERPFirma" value="Ön Değer ERP Firma:" />
+                                <p:selectOneMenu id="onDegerERPFirma" value="#{onDegerlerBean.eklenecekYeniKullanici.ERP_ON_DEGER_FIRMA_NUMBER}" 
+                                                 style="width:270px" required="true" requiredMessage="Lütfen ön değer ERP firmayı seçiniz!">
+                                <f:selectItem itemLabel="Seçiniz" itemValue="#{null}" />
+                                <f:selectItems value="#{onDegerlerBean.erpFirmalari}" 
+                                               var="ERPfirma" itemLabel="(#{ERPfirma.ERP_FIRMA_NUMBER}) - #{ERPfirma.ERP_FIRMA_UNVANI}" 
+                                               itemValue="#{ERPfirma.ERP_FIRMA_NUMBER}" />
+                                </p:selectOneMenu>
+                                <p:message for="onDegerERPFirma" />
+                                
+                                <h:outputLabel for="aktifPasifTutar" value="Tutarlar Görünsün mü?:" />
+                                <p:inputSwitch onLabel="Evet" offLabel="Hayır" id="aktifPasifTutar"
+                                               value="#{onDegerlerBean.eklenecekYeniKullanici.aktifPasifTutarBoolean}" />
+                                <p:message for="aktifPasifTutar" />
+
+                                <f:facet name="footer">
+                                     <p:commandButton value="Kaydet" action="#{onDegerlerBean.kaydetYeniKullanici()}"
+                                        update="@form" icon="fa fa-floppy-o"/>
+                                </f:facet>                          
+                            </h:panelGrid>
+                        </p:fieldset>                        
+                        <br/>
+                        <br/>
+                        <p:dataTable id="kullaniciDataTable" var="kullanici" value="#{onDegerlerBean.kullanicilar}" editable="true" style="margin-bottom:20px;font-size:12px;">
+                            <f:facet name="header">
+                                KULLANICILAR                                   
+                            </f:facet>
+                            <p:ajax event="rowEdit" listener="#{onDegerlerBean.guncelleKullanici}" update="kullaniciDataTable"/>
+                            <p:ajax event="rowEditCancel" listener="#{onDegerlerBean.onRowCancel}" update="kullaniciDataTable"/>
+                            <p:column headerText="Kullanıcı Adı" style="width:125px">
+                                <p:cellEditor>
+                                    <f:facet name="output"><h:outputText value="#{kullanici.KULLANICI_ADI}" /></f:facet>
+                                    <f:facet name="input"><p:inputText value="#{kullanici.KULLANICI_ADI}" style="width:100%"/></f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="Şifre" style="width:125px">
+                                <p:cellEditor>
+                                    <f:facet name="output"><p:password value="#{kullanici.SIFRE}" redisplay="true" disabled="true"/></f:facet>
+                                    <f:facet name="input"><p:password value="#{kullanici.SIFRE}" redisplay="true" style="width:100%;" /></f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="Ad" style="width:125px">
+                                <p:cellEditor>
+                                    <f:facet name="output"><h:outputText value="#{kullanici.AD}" /></f:facet>
+                                    <f:facet name="input"><p:inputText value="#{kullanici.AD}" style="width:100%"/></f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="Soyad" style="width:125px">
+                                <p:cellEditor>
+                                    <f:facet name="output"><h:outputText value="#{kullanici.SOYAD}" /></f:facet>
+                                    <f:facet name="input"><p:inputText value="#{kullanici.SOYAD}" style="width:100%" /></f:facet>
+                                </p:cellEditor>
+                            </p:column> 
+                            <p:column headerText="E-mail" style="width:125px">
+                                <p:cellEditor>
+                                    <f:facet name="output"><h:outputText value="#{kullanici.MAIL_ADRESI}" /></f:facet>
+                                    <f:facet name="input"><p:inputText value="#{kullanici.MAIL_ADRESI}" style="width:100%" /></f:facet>
+                                </p:cellEditor>
+                            </p:column> 
+                            <p:column headerText="Firma">
+                                <p:cellEditor>
+                                    <f:facet name="output"><h:outputText value="#{kullanici.ON_DEGER_FIRMA.FIRMA_UNVANI}" /></f:facet>
+                                    <f:facet name="input">
+                                        <h:selectOneMenu value="#{kullanici.ON_DEGER_FIRMA.FIRMA_ID}" style="width:100%">
+                                            <f:selectItems value="#{onDegerlerBean.kullaniciFirmalari}" var="kullaniciFirmalari" itemLabel="#{kullaniciFirmalari.FIRMA_UNVANI}" itemValue="#{kullaniciFirmalari.FIRMA_ID}" />
+                                        </h:selectOneMenu>
+                                    </f:facet>
+                                </p:cellEditor>                
+                            </p:column>
+                            <p:column headerText="ERP Firma">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="(#{kullanici.ERP_ON_DEGER_FIRMA.ERP_FIRMA_NUMBER}) - #{kullanici.ERP_ON_DEGER_FIRMA.ERP_FIRMA_UNVANI}" />
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <h:selectOneMenu value="#{kullanici.ERP_ON_DEGER_FIRMA.ERP_FIRMA_NUMBER}" style="width:100%">
+                                            <f:selectItems value="#{onDegerlerBean.erpFirmalari}" 
+                                                           var="erpFirmalari" 
+                                                           itemLabel="(#{erpFirmalari.ERP_FIRMA_NUMBER}) - #{erpFirmalari.ERP_FIRMA_UNVANI}" 
+                                                           itemValue="#{erpFirmalari.ERP_FIRMA_NUMBER}" />
+                                        </h:selectOneMenu>
+                                    </f:facet>
+                                </p:cellEditor>                
+                            </p:column>
+                            <p:column headerText="Tutar" style="width:35px">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <p:selectBooleanButton onLabel="E" offLabel="H" disabled="true"
+                                               value="#{kullanici.aktifPasifTutarBoolean}" />
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:selectBooleanButton onLabel="E" offLabel="H" style="width:90%"
+                                                       value="#{kullanici.aktifPasifTutarBoolean}" />
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column style="width:15px">
+                                <p:rowEditor />
+                            </p:column>
+                            <p:column style="width:35px;text-align: center" headerText="Sil">
+                                <p:commandButton update="kullaniciDataTable" icon="fa fa-trash-o"
+                                                 action="#{onDegerlerBean.silKullanici()}" process="kullaniciDataTable">
+                                    <p:confirm header="Kullanıcı Silme Onayı" message="Kullanıcı silmek istediğinizden emin misiniz?" icon="fa fa-bell-o" />
+                                    <f:setPropertyActionListener value="#{kullanici}" target="#{onDegerlerBean.silinecekKullanici}" />
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+                        <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">
+                            <center>
+                                <p:commandButton value="Evet" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-check" />
+                                <p:commandButton value="Hayır" type="button" styleClass="ui-confirmdialog-no" icon="fa fa-close" />
+                            </center>
+                        </p:confirmDialog>
+                     </h:form>
+                </p:tab>
+                <p:tab title="Firma" >
+                    <h:form id="firmaForm">
+                        <p:growl id="growl1" showDetail="false" sticky="false" escape="false"/> 
+                        <p:fieldset id="firmaEkleFieldSet" collapsed="true" legend="Firma Ekle" 
+                                    toggleable="true" toggleSpeed="500">                            
+                            <h:panelGrid columns="3" cellpadding="5" style="font-size: 14px">            
+                                <h:outputLabel for="firmaUnvani" value="Unvan:" /> 
+                                <p:inputText id="firmaUnvani" value="#{onDegerlerBean.eklenecekYeniFirma.FIRMA_UNVANI}" 
+                                             style="width:300px" required="true" requiredMessage="Lütfen unvan giriniz!"
+                                             placeholder="Unvan"/>
+                                <p:message for="firmaUnvani" />                                
+                                <h:outputLabel for="firmaVKNTCKN" value="VKN/TCKN:" /> 
+                                <p:inputText id="firmaVKNTCKN" value="#{onDegerlerBean.eklenecekYeniFirma.FIRMA_VKNTCKN}" 
+                                             style="width:300px" required="true" requiredMessage="Lütfen VKN/TCKN giriniz!"
+                                             placeholder="VKN/TCKN" maxlength="11"/>
+                                <p:message for="firmaVKNTCKN" />                                
+                                <h:outputLabel for="firmaVergiDairesi" value="Vergi Dairesi:" /> 
+                                <p:inputText id="firmaVergiDairesi" value="#{onDegerlerBean.eklenecekYeniFirma.FIRMA_VERGI_DAIRESI}" 
+                                             style="width:300px" required="true" requiredMessage="Lütfen vergi dairesi giriniz!"
+                                             placeholder="Vergi Dairesi"/>
+                                <p:message for="firmaVergiDairesi" />                                
+                                <h:outputLabel for="firmaAdres" value="Adres:" /> 
+                                <p:inputText id="firmaAdres" value="#{onDegerlerBean.eklenecekYeniFirma.FIRMA_ADRESI}" 
+                                             style="width:300px" required="true" requiredMessage="Lütfen adres giriniz!"
+                                             placeholder="Adres"/>
+                                <p:message for="firmaAdres" />                                
+                                <h:outputLabel for="firmaIl" value="İl:" /> 
+                                <p:inputText id="firmaIl" value="#{onDegerlerBean.eklenecekYeniFirma.FIRMA_IL}" 
+                                             style="width:300px" required="true" requiredMessage="Lütfen il giriniz!"
+                                             placeholder="İl"/>
+                                <p:message for="firmaIl" />                                
+                                <h:outputLabel for="firmaIlce" value="İlçe:" /> 
+                                <p:inputText id="firmaIlce" value="#{onDegerlerBean.eklenecekYeniFirma.FIRMA_ILCE}" 
+                                             style="width:300px" required="true" requiredMessage="Lütfen ilçe giriniz!"
+                                             placeholder="İlçe"/>
+                                <p:message for="firmaIlce" />                                
+                                <h:outputLabel for="firmaMail1" value="Mail (1):" /> 
+                                <p:inputText id="firmaMail1" value="#{onDegerlerBean.eklenecekYeniFirma.FIRMA_MAIL_ADRESI1}" 
+                                             style="width:300px" required="true" requiredMessage="Lütfen mail(1) giriniz!"
+                                             placeholder="Mail(1)"/>
+                                <p:message for="firmaMail1" />                                
+                                <h:outputLabel for="firmaMail2" value="Mail (2):" /> 
+                                <p:inputText id="firmaMail2" value="#{onDegerlerBean.eklenecekYeniFirma.FIRMA_MAIL_ADRESI2}" 
+                                             style="width:300px" placeholder="Mail(2)"/>
+                                <p:message for="firmaMail2" />                                
+                                <h:outputLabel for="firmaTelefon1" value="Telefon(1):" /> 
+                                <p:inputText id="firmaTelefon1" value="#{onDegerlerBean.eklenecekYeniFirma.FIRMA_TELEFON1}" 
+                                             style="width:300px" required="true" requiredMessage="Lütfen telefon(1) giriniz!"
+                                             placeholder="Telefon(1)"/>
+                                <p:message for="firmaTelefon1" />                                
+                                <h:outputLabel for="firmaTelefon2" value="Telefon(2):" /> 
+                                <p:inputText id="firmaTelefon2" value="#{onDegerlerBean.eklenecekYeniFirma.FIRMA_TELEFON2}" 
+                                             style="width:300px" placeholder="Telefon(2)"/>
+                                <p:message for="firmaTelefon2" />                                
+                                <h:outputLabel for="firmaFax" value="Fax:" /> 
+                                <p:inputText id="firmaFax" value="#{onDegerlerBean.eklenecekYeniFirma.FIRMA_FAX}" 
+                                             style="width:300px" placeholder="Fax"/>
+                                <p:message for="firmaFax" />                                
+                                 <f:facet name="footer">
+                                     <p:commandButton value="Kaydet" action="#{onDegerlerBean.kaydetYeniFirma()}"
+                                        update="@form" icon="fa fa-floppy-o"/>
+                                </f:facet>                          
+                            </h:panelGrid>
+                        </p:fieldset>                        
+                        <br/>
+                        <br/>
+                        
+                        <p:dataTable id="firmaDataTable" var="firma" value="#{onDegerlerBean.firmalar}" editable="true" style="margin-bottom:20px;font-size:14px;">
+                            <f:facet name="header">
+                                FİRMALAR
+                            </f:facet>
+                            
+                            <p:ajax event="rowEdit" listener="#{onDegerlerBean.guncelleFirma}" update="firmaDataTable"/>
+                            <p:ajax event="rowEditCancel" listener="#{onDegerlerBean.onRowCancel1}" update="firmaDataTable"/>
+
+                            <p:column headerText="Unvan">
+                                <p:cellEditor>
+                                    <f:facet name="output"><h:outputText value="#{firma.FIRMA_UNVANI}" /></f:facet>
+                                    <f:facet name="input"><p:inputText value="#{firma.FIRMA_UNVANI}" style="width:100%"/></f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="VKN/TCKN">
+                                <p:cellEditor>
+                                    <f:facet name="output"><h:outputText value="#{firma.FIRMA_VKNTCKN}" /></f:facet>
+                                    <f:facet name="input"><p:inputText value="#{firma.FIRMA_VKNTCKN}" style="width:100%"/></f:facet>
+                                </p:cellEditor>
+                            </p:column>                            
+                            <p:column headerText="Vergi Dairesi">
+                                <p:cellEditor>
+                                    <f:facet name="output"><h:outputText value="#{firma.FIRMA_VERGI_DAIRESI}" /></f:facet>
+                                    <f:facet name="input"><p:inputText value="#{firma.FIRMA_VERGI_DAIRESI}" style="width:100%"/></f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="Adres">
+                                <p:cellEditor>
+                                    <f:facet name="output"><h:outputText value="#{firma.FIRMA_ADRESI}" /></f:facet>
+                                    <f:facet name="input"><p:inputText value="#{firma.FIRMA_ADRESI}" style="width:100%"/></f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="İl">
+                                <p:cellEditor>
+                                    <f:facet name="output"><h:outputText value="#{firma.FIRMA_IL}" /></f:facet>
+                                    <f:facet name="input"><p:inputText value="#{firma.FIRMA_IL}" style="width:100%"/></f:facet>
+                                </p:cellEditor>
+                            </p:column>                            
+                            <p:column headerText="İlçe">
+                                <p:cellEditor>
+                                    <f:facet name="output"><h:outputText value="#{firma.FIRMA_ILCE}" /></f:facet>
+                                    <f:facet name="input"><p:inputText value="#{firma.FIRMA_ILCE}" style="width:100%"/></f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="Mail(1)">
+                                <p:cellEditor>
+                                    <f:facet name="output"><h:outputText value="#{firma.FIRMA_MAIL_ADRESI1}" /></f:facet>
+                                    <f:facet name="input"><p:inputText value="#{firma.FIRMA_MAIL_ADRESI1}" style="width:100%"/></f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="Mail(2)">
+                                <p:cellEditor>
+                                    <f:facet name="output"><h:outputText value="#{firma.FIRMA_MAIL_ADRESI2}" /></f:facet>
+                                    <f:facet name="input"><p:inputText value="#{firma.FIRMA_MAIL_ADRESI2}" style="width:100%"/></f:facet>
+                                </p:cellEditor>
+                            </p:column>                            
+                            <p:column headerText="Telefon(1)">
+                                <p:cellEditor>
+                                    <f:facet name="output"><h:outputText value="#{firma.FIRMA_TELEFON1}" /></f:facet>
+                                    <f:facet name="input"><p:inputText value="#{firma.FIRMA_TELEFON1}" style="width:100%"/></f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="Telefon(2)">
+                                <p:cellEditor>
+                                    <f:facet name="output"><h:outputText value="#{firma.FIRMA_TELEFON2}" /></f:facet>
+                                    <f:facet name="input"><p:inputText value="#{firma.FIRMA_TELEFON2}" style="width:100%"/></f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="Fax">
+                                <p:cellEditor>
+                                    <f:facet name="output"><h:outputText value="#{firma.FIRMA_FAX}" /></f:facet>
+                                    <f:facet name="input"><p:inputText value="#{firma.FIRMA_FAX}" style="width:100%"/></f:facet>
+                                </p:cellEditor>
+                            </p:column> 
+                            <p:column style="width:15px">
+                                <p:rowEditor />
+                            </p:column>
+                            <p:column style="width:35px;text-align: center" headerText="Sil">
+                                <p:commandButton update="firmaDataTable" icon="fa fa-trash-o"
+                                                 action="#{onDegerlerBean.silFirma()}" process="firmaDataTable">
+                                    <p:confirm header="Firma Silme Onayı" message="Firma silmek istediğinizden emin misiniz?" icon="fa fa-bell-o" />
+                                    <f:setPropertyActionListener value="#{firma}" target="#{onDegerlerBean.silinecekFirma}" />
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+                     </h:form>
+                </p:tab>                
+            </p:tabView>        
+    </ui:define>
+</ui:composition>

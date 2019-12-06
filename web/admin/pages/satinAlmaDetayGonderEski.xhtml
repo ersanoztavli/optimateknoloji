@@ -1,0 +1,142 @@
+<ui:composition template="templateAdmin.xhtml"
+     xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:f="http://java.sun.com/jsf/core"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:p="http://primefaces.org/ui">    
+    <ui:define name="content">
+    <style type="text/css">
+        .ui-tabs.ui-tabs-left > .ui-tabs-nav {
+            width: 10%;
+         }
+         /** panels **/
+        .ui-tabs.ui-tabs-left > .ui-tabs-panels {
+            width: 90%;
+        }        
+    </style>
+    <p:breadCrumb>
+            <p:menuitem value="Ana Sayfa" url="/admin/pages/welcomeAdmin.jsf" />
+            <p:menuitem value="Satın Alma" url="/admin/pages/satinAlma.jsf" />
+            <p:menuitem value="Teklif Detay" url="/admin/pages/satinAlmaDetay.jsf" />
+            <p:menuitem value="Teklif Detay Gönder" url="/admin/pages/satinAlmaDetayGonder.jsf" />
+    </p:breadCrumb>
+        <p:tabView style="height: auto;width: auto;" 
+                   orientation="left"
+                   id="tabView">
+            <p:tab title="Mail">
+            <h:form id="satinAlmaTeklifDetayMailForm" enctype="multipart/form-data"  prependId="false">    
+                <p:growl id="growl" showDetail="false" sticky="false" escape="false"/>
+                <center>
+                    <h:panelGrid columns="2" cellpadding="5" id="mailGonderTopPanelGrid" style="font-size: 16px;"> 
+                       <h:outputLabel for="kimden" value="Kimden:" style="font-weight: bold"/>
+                       <p:inplace>
+                           <p:inputText id="kimden" value="#{satinAlmaDetayGonderBean.gonderilecekMail.MAIL_GONDEREN}" 
+                                      style="width: 600px;"/>
+                       </p:inplace>                  
+
+                       <h:outputLabel for="konu" value="Konu:" style="font-weight: bold"/> 
+                       <p:inputText id="konu" value="#{satinAlmaDetayGonderBean.gonderilecekMail.MAIL_KONU}"
+                                    required="true" requiredMessage="Lütfen konu giriniz!"
+                                    placeholder="Konu" style="width: 600px"/>
+
+                       <h:outputLabel for="icerik" value="İçerik:" style="font-weight: bold"/> 
+                       <p:inputTextarea id="icerik" value="#{satinAlmaDetayGonderBean.gonderilecekMail.MAIL_ICERIK}"
+                                       required="true" requiredMessage="Lütfen içerik giriniz!"
+                                       placeholder="İçerik" style="width: 600px"/>
+                        <f:facet name="header">
+                            <h:panelGrid columns="1" cellpadding="5" style="font-size: 16px;margin-left: 90px;">
+                                <p:commandButton icon="fa fa-send" 
+                                                 value="Gönder" 
+                                                 action="#{satinAlmaDetayGonderBean.mailGonder()}"
+                                                 style="margin: 5px; width: 150px; height: 40px" 
+                                                 update="@form"  
+                                                 process="mailGonderTopPanelGrid">
+                                </p:commandButton>
+                            </h:panelGrid>
+                        </f:facet> 
+                    </h:panelGrid>
+                    <h:panelGrid columns="1" cellpadding="5" id="msuterilerPanelGrid" >
+                        <p:pickList 
+                            id="musterilerPickList" value="#{satinAlmaBean.mailListSatinAlmaList}" 
+                            var="mailListSatinAlma" effect="puff"
+                            itemValue="#{mailListSatinAlma}" itemLabel="#{mailListSatinAlma.musteriUnvan}"                            
+                            showSourceFilter="true" showTargetFilter="true"
+                            filterMatchMode="contains" converter="mailListSatinAlmaConverter" 
+                            converterMessage="deneme"
+                            responsive="true" style="font-size: 14px;">
+                            <f:facet name="sourceCaption">Tüm Tedarikçiler</f:facet>
+                            <f:facet name="targetCaption">Seçilen Tedarikçiler</f:facet>
+                            <p:ajax event="transfer" listener="#{satinAlmaBean.onTransfer}" update="mailDataTable"/>
+                            <p:column>
+                                <h:outputText value="#{mailListSatinAlma.musteriUnvan}" />
+                            </p:column>
+                        </p:pickList>
+                            <p:dataTable var="mail" value="#{satinAlmaBean.mailListSatinAlmaListTarget}" 
+                                         editable="true" id="mailDataTable" style="font-size: 14px">
+                               <f:facet name="header">
+                                   Seçilen Tedarikçi Mailleri
+                               </f:facet>
+                               <p:ajax event="rowEdit" update="mailDataTable"/>
+                               <p:ajax event="rowEditCancel" update="mailDataTable"/>
+                               <p:column headerText="Unvan">
+                                   <h:outputText value="#{mail.musteriUnvan}"/>                                                          
+                               </p:column>
+                               <p:column headerText="Mail">
+                                   <p:cellEditor>
+                                       <f:facet name="output"><h:outputText value="#{mail.mailAdres}"/></f:facet>
+                                       <f:facet name="input"><p:inputText value="#{mail.mailAdres}" style="width:100%"/></f:facet>
+                                   </p:cellEditor>                        
+                               </p:column>
+                               <p:column style="width:13px;">
+                                        <p:rowEditor />
+                               </p:column>
+                           </p:dataTable>
+                    </h:panelGrid>
+                    <h:panelGrid columns="1" cellpadding="5"  style="font-size: 14px;"> 
+                        <p:dataTable var="mailDosya" value="#{satinAlmaBean.mailDosyaList}" 
+                                     id="mailDosyaDataTable" style="font-size: 14px;"
+                                     rowKey="#{mailDosya.mailDosyaAdiUzun}">
+                            <f:facet name="header">
+                                Ekler
+                            </f:facet>  
+                            <p:column headerText="Dosya Adı">
+                                <h:outputText value="#{mailDosya.MAIL_DOSYA_ADI}" />
+                            </p:column>
+                            <p:column headerText="Dosya Boyutu">
+                                <h:outputText value="#{mailDosya.boyut}" />
+                            </p:column>                            
+                            <p:column style="width:60px;text-align: center" headerText="Sil">
+                                <p:commandButton update="mailDosyaDataTable" icon="fa fa-trash-o"
+                                                 action="#{satinAlmaBean.silMailDosya()}" process="mailDosyaDataTable">
+                                    <f:setPropertyActionListener value="#{mailDosya}" target="#{satinAlmaBean.silinecekMailDosya}" />
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+                            <h:inputFile value="#{satinAlmaBean.yuklenecekDosya}" style="width: 100%" >
+                                <f:ajax listener="#{satinAlmaBean.kaydetYeniDosya}" render="mailDosyaDataTable"/>
+                            </h:inputFile>
+                    </h:panelGrid> 
+                </center>    
+            </h:form>     
+        </p:tab>
+        <p:tab title="SMS">
+            <h:form id="satinAlmaTeklifDetaySMSForm">   
+            <p:growl id="growl" showDetail="false" sticky="false" escape="false"/> 
+
+            </h:form>     
+        </p:tab>
+        <p:tab title="WhatsApp">
+            <h:form id="satinAlmaTeklifDetayWhatsAppForm">   
+            <p:growl id="growl" showDetail="false" sticky="false" escape="false"/> 
+
+            </h:form>     
+        </p:tab>
+        <p:tab title="Fax">
+            <h:form id="satinAlmaTeklifDetayFaxForm">   
+            <p:growl id="growl" showDetail="false" sticky="false" escape="false"/> 
+
+            </h:form>     
+        </p:tab>
+    </p:tabView> 
+    </ui:define>
+</ui:composition>

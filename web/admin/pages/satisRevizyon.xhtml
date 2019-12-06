@@ -1,0 +1,342 @@
+<ui:composition template="templateAdmin.xhtml"
+     xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:f="http://java.sun.com/jsf/core"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:p="http://primefaces.org/ui">    
+    <ui:define name="content">
+        <style type="text/css">
+            .value {
+                font-weight: bold;
+            }
+
+            .ui-datatable {
+                margin-bottom: 25px
+            }
+
+            .ui-datatable .ui-datatable-footer {
+                text-align:left;
+            }
+
+            .ui-datalist ul {
+                padding: 0 0 0 10px;
+                margin: 5px 0;
+            }
+
+            .ui-datatable .ui-button-icon-only .ui-button-text {
+                padding: 0;
+                line-height: 1.2;
+            }
+            
+            .ui-datatable-header {
+                height: 35px
+            }
+            
+            .ui-datatable-footer {
+                height: 35px
+            }
+            
+            .layout-wrapper .topbar {
+                z-index: 10000000;
+             }
+
+             .layout-wrapper .layout-menu {
+                z-index: 9999999;
+             }
+            .ui-paginator a {
+                margin-right: 5px;
+            }
+            .ui-autocomplete input {
+                width:500px;
+            }
+        </style>
+        <script type="text/javascript">    
+            PrimeFaces.locales['tr'] = {
+                closeText: 'Kapat',
+                prevText: 'İleri',
+                nextText: 'Geri',
+                monthNames: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'],
+                monthNamesShort: ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'],
+                dayNames: ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'],
+                dayNamesShort: ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'],
+                dayNamesMin: ['Pa', 'Pz', 'Sa', 'Ça ', 'Pe', 'Cu ', 'Cm'],
+                weekHeader: 'Hafta',
+                FirstDay: 2,
+                isRTL: false,
+                showMonthAfterYear: false,
+                yearSuffix: '',
+                timeOnlyTitle: 'Nur Zeit',
+                timeText: 'Zaman',
+                hourText: 'Saat',
+                minuteText: 'Dakika',
+                secondText: 'Saniye',
+                currentText: 'Bugün',
+                ampm: false,
+                month: 'Ay',
+                week: 'Hafta',
+                day: 'Gün',
+                allDayText: 'Tüm Gün'
+            };
+            
+            window.onload = function() {
+                $('body').on('mousedown', '.ui-autocomplete-panel', function(event) { event.stopImmediatePropagation();});
+              };
+        </script>
+        <p:breadCrumb id="breadCrumb">
+                <p:menuitem value="Ana Sayfa" url="/admin/pages/welcomeAdmin.jsf" />
+                <p:menuitem value="Satış" url="/admin/pages/satis.jsf" />
+                <p:menuitem value="Satış Revizyon" url="/admin/pages/satisRevizyon.jsf" />
+        </p:breadCrumb> 
+        <h:form id="excelSatisTeklifiForm" enctype="multipart/form-data">           
+            <p:growl id="growl" showDetail="false" sticky="false" escape="false"/> 
+            <p:hotkey bind="f8" 
+                      process="@this"
+                      update="teklifSatirlariDataTable" 
+                      actionListener="#{satisRevizyonBean.ekleSatir()}"/>
+            <div class="ui-g" style="font-size: 14px;margin: 5px;" id="div1">
+                <div class="ui-g-2">
+                    <h:outputLabel for="teklifNo" value="Teklif Numarası:" style="font-weight: bold"/>                    
+                </div>
+                <div class="ui-g-4">
+                    <p:outputLabel id="teklifNo" style="width: 85%;"
+                                   value="#{satisRevizyonBean.revizeEdilecekTeklifBaslik.TEKLIF_NUMARASI}"/>
+                </div>
+                <div class="ui-g-2">
+                    <h:outputLabel for="teklifTarihi" value="Teklif Tarihi:" style="font-weight: bold"/>                     
+                </div>
+                <div class="ui-g-4">
+                    <p:calendar id="teklifTarihi" value="#{satisRevizyonBean.revizeEdilecekTeklifBaslik.TEKLIF_TARIHI}" 
+                                placeholder="Teklif Tarihi" locale="tr" style="width: 90%;">
+                        <p:ajax event="change" process="@this" update="@this"/>
+                        <p:ajax event="dateSelect" process="@this" update="@this"/>
+                    </p:calendar>
+                </div>
+            </div>
+            <div class="ui-g" style="font-size: 14px;margin: 5px;" id="div2">
+                <div class="ui-g-2">
+                    <h:outputLabel for="teklifBaslangicTarihi" value="Teklif Başlangış Tarihi:" style="font-weight: bold"/>
+                </div>
+                <div class="ui-g-4"> 
+                    <p:calendar id="teklifBaslangicTarihi" value="#{excelSatisTeklifiBean.exceldenYuklenecekTeklifBaslik.TEKLIF_BASLANGIC_TARIHI}" 
+                                placeholder="Teklif Başlangış Tarihi" locale="tr" style="width: 90%;">
+                        <p:ajax event="change" process="@this" update="@this"/>
+                        <p:ajax event="dateSelect" process="@this" update="@this"/>
+                    </p:calendar>
+                </div>
+                <div class="ui-g-2">
+                    <h:outputLabel for="teklifBitisTarihi" value="Teklif Bitiş Tarihi:" style="font-weight: bold"/>
+                </div>
+                <div class="ui-g-4"> 
+                    <p:calendar id="teklifBitisTarihi" value="#{excelSatisTeklifiBean.exceldenYuklenecekTeklifBaslik.TEKLIF_BITIS_TARIHI}" 
+                                placeholder="Teklif Bitiş Tarihi" locale="tr" style="width: 90%;">
+                        <p:ajax event="change" process="@this" update="@this"/>
+                        <p:ajax event="dateSelect" process="@this" update="@this"/>
+                    </p:calendar>
+                </div>
+            </div>
+            <div class="ui-g" style="font-size: 14px;margin: 5px;" id="div3">
+                <div class="ui-g-2">
+                    <h:outputLabel for="musteri" value="Müşteri:" style="font-weight: bold"/>
+                </div>
+                <div class="ui-g-4">
+                     <p:outputLabel id="musteri" style="width: 85%;"
+                                   value="#{satisRevizyonBean.revizeEdilecekTeklifBaslik.musteriUnvani}"/>
+                </div>
+                <div class="ui-g-2">
+                    <h:outputLabel for="gemi" value="Belge No:" style="font-weight: bold"/>
+                </div>
+                <div class="ui-g-4"> 
+                    <p:inputText id="gemi" value="#{satisRevizyonBean.revizeEdilecekTeklifBaslik.BELGE_NO}" 
+                                 placeholder="Belge No" style="width: 90%;">     
+                        <p:ajax event="change" process="@this" update="@this"/>
+                    </p:inputText>
+                </div>
+            </div>
+            <div class="ui-g" style="font-size: 14px;margin: 5px;" id="div4">
+                <div class="ui-g-2">
+                    <h:outputLabel for="paraBirimi" value="Para Birimi:" style="font-weight: bold"/>
+                </div>
+                <div class="ui-g-4">
+                    <p:selectOneButton value="#{satisRevizyonBean.revizeEdilecekTeklifBaslik.TEKLIF_PARA_BIRIMI}"
+                                       style="width: 50%;" id="paraBirimi">
+                        <p:ajax process="@this" update="@this kur" oncomplete="#{satisRevizyonBean.guncelleKur()}"/>
+                        <f:selectItem itemLabel="₺" itemValue="0"/>
+                        <f:selectItem itemLabel="€" itemValue="20"/>
+                        <f:selectItem itemLabel="$" itemValue="1"/>
+                    </p:selectOneButton>
+                </div>
+                <div class="ui-g-2">
+                     <h:outputLabel for="kur" value="Kur:" style="font-weight: bold"/>
+                </div>
+                <div class="ui-g-4">
+                    <p:inputNumber id="kur" value="#{satisRevizyonBean.revizeEdilecekTeklifBaslik.TEKLIF_KUR}" 
+                                   minValue="1.0" decimalSeparator="," thousandSeparator="." decimalPlaces="4">
+                        <p:ajax event="change" process="@this" update="@this"/>
+                    </p:inputNumber>
+                    <p:commandButton icon="fa fa-refresh"
+                                     update="kur" 
+                                     actionListener="#{satisRevizyonBean.guncelleKur()}"/>
+                </div>
+            </div>
+            <div class="ui-g" style="font-size: 14px;margin: 5px;" id="div5">
+                <div class="ui-g-2">
+                    <h:outputLabel for="aciklama1" value="Açıklama 1:" style="font-weight: bold"/> 
+                </div>
+                <div class="ui-g-4">
+                    <p:inputTextarea id="aciklama1" value="#{satisRevizyonBean.revizeEdilecekTeklifBaslik.TEKLIF_ACIKLAMA1}" 
+                                     placeholder="Açıklama 1" rows="2" cols="40">      
+                        <p:ajax event="change" process="@this" update="@this"/>
+                    </p:inputTextarea>
+                </div>
+                <div class="ui-g-2">
+                    <h:outputLabel for="aciklama2" value="Açıklama 2:" style="font-weight: bold"/> 
+                </div>
+                <div class="ui-g-4">
+                    <p:inputTextarea id="aciklama2" value="#{satisRevizyonBean.revizeEdilecekTeklifBaslik.TEKLIF_ACIKLAMA2}" 
+                                     placeholder="Açıklama 2" rows="2" cols="40">
+                        <p:ajax event="change" process="@this" update="@this"/>
+                    </p:inputTextarea>
+                </div>
+            </div>            
+            <div class="ui-g" style="font-size: 14px;margin: 5px;" id="div6">
+                <div class="ui-g-2">
+                    <h:outputLabel for="aciklama3" value="Açıklama 3:" style="font-weight: bold"/> 
+                </div>
+                <div class="ui-g-4">
+                    <p:inputTextarea id="aciklama3" value="#{satisRevizyonBean.revizeEdilecekTeklifBaslik.TEKLIF_ACIKLAMA3}" 
+                                     placeholder="Açıklama 3" rows="2" cols="40">
+                        <p:ajax event="change" process="@this" update="@this"/>
+                    </p:inputTextarea>
+                </div>
+                <div class="ui-g-6">
+                    <p:fileUpload auto="false" fileUploadListener="#{satisRevizyonBean.handleFileUpload}"
+                                  mode="advanced" dragDropSupport="true" label="Excel Seç" 
+                                  uploadLabel="Yükle" cancelLabel="Sil"
+                                  allowTypes="/(\.|\/)(xlsx)$/" update="@form" style="font-size: 14px;"/>
+                </div>
+            </div> 
+            
+            <center>
+                <p:commandButton value="Revize Et" action="#{satisRevizyonBean.revizeEtTeklif()}"
+                                 update="growl" icon="fa fa-floppy-o" id="kaydetButon" style="font-size: 14px;margin-left: 10px">
+                    <p:confirm header="Teklif Revizyon Onayı" message="Teklifi revize etmek istediğinizden emin misiniz?" icon="fa fa-bell-o" />
+                </p:commandButton> 
+                <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">
+                    <center>
+                        <p:commandButton value="Evet" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-check" />
+                        <p:commandButton value="Hayır" type="button" styleClass="ui-confirmdialog-no" icon="fa fa-close" />
+                    </center>
+                </p:confirmDialog>
+            </center>     
+            <p:dataTable 
+                     var="teklifSatir" value="#{satisRevizyonBean.revizeEdilecekTeklifSatirlari}" 
+                     id="teklifSatirlariDataTable"  widgetVar="teklifSatirlariDataTable"
+                     editable="true" rowIndexVar="index" editMode="cell"
+                     rowKey="#{teklifSatir.TEKLIF_SATIR_ID}" 
+                     paginator="true" rows="25" 
+                     paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" 
+                     rowsPerPageTemplate="25,50,100,200,400"
+                     style="font-size:14px; margin-top: 10px">
+                <p:ajax event="rowReorder"/>
+                <f:facet name="header">
+                    Teklif Satırları Listesi 
+                    <p:commandButton value="Şablon İndir" ajax="false" immediate="true" icon="fa fa-download" 
+                                     style="float: left;" actionListener="#{satisRevizyonBean.sablonExcelHazirla()}">
+                            <p:fileDownload value="#{satisRevizyonBean.sablonExcel}"/>
+                    </p:commandButton>
+                </f:facet>
+                <p:column style="width:25px;text-align:center">
+                    <f:facet name="header">
+                        <h:outputText value="Sıra" id="sira"/>
+                    </f:facet>
+                    <h:outputText value="#{index + 1}" />
+                </p:column>    
+                <p:column style="width:100px;" id="kodKolon">
+                    <f:facet name="header">
+                        <h:outputText value="Kod" />
+                    </f:facet>
+                    <p:autoComplete minQueryLength="3" effect="explode" forceSelection="true"
+                                    queryDelay="500" scrollHeight="500" 
+                                    value="#{teklifSatir.MALZEME_HIZMET_MASRAF_KODU}" id="kodInput"
+                                    completeMethod="#{satisRevizyonBean.satirKodTamamla}"
+                                    style = "width: 90%" inputStyle = "width: 100%"
+                                    disabled="#{teklifSatir.TEKLIF_SATIR_ID>0}">
+                        <p:ajax event="itemSelect" id="kodAjax" 
+                                listener="#{satisRevizyonBean.satirKodSecildi}" 
+                                update="@([id$=kodInput]) @([id$=adInput]) 
+                                        @([id$=ad2Input]) @([id$=birimInput])"/>
+                    </p:autoComplete>                  
+                </p:column>
+                <p:column id="adKolon">
+                    <f:facet name="header">
+                        <h:outputText value="Ad" />
+                    </f:facet>
+                    <p:autoComplete minQueryLength="3" effect="explode" 
+                                    queryDelay="500" scrollHeight="500"
+                                    value="#{teklifSatir.MALZEME_HIZMET_MASRAF_ADI}" id="adInput"  
+                                    completeMethod="#{satisRevizyonBean.satirAdTamamla}"
+                                    style = "width: 90%" inputStyle = "width: 100%"
+                                    disabled="#{teklifSatir.TEKLIF_SATIR_ID>0}">
+                        <p:ajax event="itemSelect" listener="#{satisRevizyonBean.satirAdSecildi}" 
+                                update="@([id$=kodInput]) @([id$=adInput])
+                                        @([id$=ad2Input]) @([id$=birimInput])"/>
+                    </p:autoComplete>
+                </p:column> 
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Ad (2)" />
+                    </f:facet>
+                    <p:autoComplete minQueryLength="3" effect="explode" 
+                                    queryDelay="500" scrollHeight="500"
+                                    value="#{teklifSatir.MALZEME_HIZMET_MASRAF_ADI2}" id="ad2Input" 
+                                    completeMethod="#{satisRevizyonBean.satirAd2Tamamla}"
+                                    style = "width: 90%" inputStyle = "width: 100%"
+                                    disabled="#{teklifSatir.TEKLIF_SATIR_ID>0}">
+                        <p:ajax event="itemSelect" listener="#{satisRevizyonBean.satirAd2Secildi}" 
+                                update="@([id$=adInput]) @([id$=ad2Input])
+                                        @([id$=kodInput]) @([id$=birimInput])"/>
+                    </p:autoComplete> 
+                </p:column>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Açıklama" />
+                    </f:facet>
+                    <h:inputTextarea id="aciklamaInput" value="#{teklifSatir.MALZEME_HIZMET_MASRAF_ACIKLAMASI}" style = "width: 95%">
+                        <p:ajax event="change" process="@this" update="@this"/>
+                    </h:inputTextarea>
+                </p:column>
+                <p:column style="width:45px;">
+                    <f:facet name="header">
+                            <h:outputText value="Miktar" />
+                    </f:facet>
+                    <p:inputNumber value="#{teklifSatir.MALZEME_HIZMET_MASRAF_MIKTARI}" decimalSeparator="," thousandSeparator=".">
+                        <p:ajax event="change" process="@this" update="@this"/>
+                    </p:inputNumber>    
+                </p:column> 
+                <p:column style="width:55px;">
+                    <f:facet name="header">
+                        <h:outputText value="Birim" />
+                    </f:facet>
+                    <h:selectOneMenu value="#{teklifSatir.MALZEME_HIZMET_MASRAF_BIRIM_KODU}" 
+                                     style="width:100%" 
+                                     id="birimInput"
+                                     disabled="#{teklifSatir.TEKLIF_SATIR_ID>0}">
+                        <p:ajax event="change" process="@this" update="@this"/>
+                        <f:selectItems value="#{satisRevizyonBean.birimListesi}" var="birim" itemLabel="#{birim}" itemValue="#{birim}" />
+                    </h:selectOneMenu>
+                </p:column> 
+                <p:column style="width:35px;text-align: center" headerText="Sil">
+                    <p:commandButton update="teklifSatirlariDataTable" icon="fa fa-trash-o"
+                                     action="#{satisRevizyonBean.silSatir()}" process="teklifSatirlariDataTable">
+                        <f:setPropertyActionListener value="#{teklifSatir}" target="#{satisRevizyonBean.silinecekSatir}" />
+                    </p:commandButton>
+                </p:column>                
+                <f:facet name="footer">                                      
+                    <p:commandButton id="satirEkleButon" value="Satır Ekle" icon="fa fa-indent" style="float: left;"
+                                     update="teklifSatirlariDataTable" immediate="true"
+                                     actionListener="#{satisRevizyonBean.ekleSatir()}"/>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+    </ui:define>
+</ui:composition>

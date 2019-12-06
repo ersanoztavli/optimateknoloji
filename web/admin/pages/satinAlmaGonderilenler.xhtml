@@ -1,0 +1,141 @@
+<ui:composition template="templateAdmin.xhtml"
+     xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:f="http://java.sun.com/jsf/core"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:ui="http://java.sun.com/jsf/facelets"
+     xmlns:p="http://primefaces.org/ui">    
+    <ui:define name="content">
+        <style type="text/css">
+            .value {
+                font-weight: bold;
+            }
+
+            .ui-datatable {
+                margin-bottom: 25px
+            }
+
+            .ui-datatable .ui-datatable-footer {
+                text-align:left;
+            }
+
+            .ui-datalist ul {
+                padding: 0 0 0 10px;
+                margin: 5px 0;
+            }
+
+            .ui-datatable .ui-button-icon-only .ui-button-text {
+                padding: 0;
+                line-height: 1.2;
+            }
+            
+            .ui-datatable-header {
+                height: 35px
+            }
+            
+            .layout-wrapper .topbar {
+                z-index: 10000000;
+            }
+
+            .layout-wrapper .layout-menu {
+                z-index: 9999999;
+            }             
+            .ui-paginator a {
+                margin-right: 5px;
+            }
+            .ui-row-editor .ui-row-editor-pencil {
+                margin-left:8px;
+            }
+            .ui-tabs.ui-tabs-left > .ui-tabs-nav {
+                width: 10%;
+             }
+             /** panels **/
+            .ui-tabs.ui-tabs-left > .ui-tabs-panels {
+                width: 90%;
+            }
+            .blue {
+                background-image: none !important;
+                color: blue !important;
+            }
+            .red {
+                background-image: none !important;
+                color: red !important;
+            }
+        </style>
+        <p:breadCrumb id="breadCrumb">
+                <p:menuitem value="Ana Sayfa" url="/admin/pages/welcomeAdmin.jsf" />
+                <p:menuitem value="Satın Alma" url="/admin/pages/satinAlma.jsf" />
+                <p:menuitem value="Yanıtlar" url="/admin/pages/satinAlmaGonderilenler.jsf" />
+        </p:breadCrumb>
+        <p:tabView style="height: auto;width: auto;" 
+                   orientation="left"
+                   id="tabView">
+                <p:tab title="Mail">
+                    <h:form id="satinAlmaGonderilenMailForm">    
+                        <p:growl id="growl" showDetail="false" sticky="false" escape="false"/>
+                        <p:dataTable id="satinAlmaGonderilenMailDataTable" var="mail" value="#{satinAlmaBean.gonderilenMailler}"
+                                     style="font-size:14px;">
+                            <f:facet name="header">
+                                Gönderilen Mailler
+                            </f:facet>
+                            <p:column style="width:16px">
+                                <p:rowToggler />
+                            </p:column>
+                            <p:column headerText="Gönderen">
+                                <h:outputText value="#{mail.MAIL_GONDEREN}" />
+                            </p:column>
+                            <p:column headerText="Konu" width="300">
+                                <h:outputText value="#{mail.MAIL_KONU}" />
+                            </p:column>                           
+                            <p:column headerText="İçerik">
+                                <h:outputText value="#{mail.MAIL_ICERIK}" />
+                            </p:column>
+                            <p:column headerText="Tarih" width="100">
+                              <h:outputText value="#{mail.MAIL_GONDERIM_TARIHI}" >
+                                <f:convertDateTime pattern="dd.MM.yyyy" />
+                              </h:outputText>
+                            </p:column>
+                            <p:rowExpansion>
+                                <p:dataTable value="#{mail.mailAdresler}" var="adres">
+                                    <p:column headerText="Tedarikçi">
+                                        <h:outputText value="#{adres.musteriUnvan}" />
+                                    </p:column>
+                                    <p:column headerText="Mail Adresi">
+                                        <h:outputText value="#{adres.MAIL_ADRESI}" />
+                                    </p:column>
+                                    <p:column style="width:120px;" headerText="Durumu">
+                                        <h:outputText value="#{adres.tamamlandiMiIsim}"
+                                                      styleClass="#{adres.TAMAMLANDI_MI eq 1 ? 'blue' : 
+                                                                                adres.TAMAMLANDI_MI eq 0 ? 'red' : null}"/>
+                                    </p:column>
+                                    <p:column style="width:60px;text-align: center" headerText="Yanıt">
+                                        <p:commandButton icon="fa fa-search-plus"
+                                                         action="#{satinAlmaBean.satinAlmaYanitDetaylariniGetir()}">
+                                           <f:setPropertyActionListener value="#{adres}" target="#{satinAlmaBean.secilenMailAdres}" />
+                                        </p:commandButton>
+                                    </p:column>
+                                </p:dataTable>
+                            </p:rowExpansion>
+                        </p:dataTable>
+                    </h:form>     
+                </p:tab>
+                <p:tab title="SMS">
+                    <h:form id="satinAlmaGonderilenSMSForm">   
+                    <p:growl id="growl" showDetail="false" sticky="false" escape="false"/> 
+
+                    </h:form>     
+                </p:tab>
+                <p:tab title="WhatsApp">
+                    <h:form id="satinAlmaGonderilenWhatsAppForm">   
+                    <p:growl id="growl" showDetail="false" sticky="false" escape="false"/> 
+
+                    </h:form>     
+                </p:tab>
+                <p:tab title="Fax">
+                    <h:form id="satinAlmaGonderilenFaxForm">   
+                    <p:growl id="growl" showDetail="false" sticky="false" escape="false"/> 
+
+                    </h:form>     
+                </p:tab>
+        </p:tabView> 
+    </ui:define>
+</ui:composition>
