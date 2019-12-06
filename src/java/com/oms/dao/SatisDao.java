@@ -1183,9 +1183,13 @@ public class SatisDao {
                 teklifBaslik.setMusteriKodu(resultSet.getString("MUSTERI_KODU"));
                 teklifBaslik.setMUSTERI_MARJ(resultSet.getDouble("MUSTERI_MARJ"));
                 
-                //Başlangıçta öncelikli tedarikçilerin getirilmemesini istiyorum
-                //Daha sonra isteyen true yaparak geitrebilir.
+                //Başlangıçta öncelikli tedarikçilerin getirilmemesini istemiyorum
+                //Daha sonra isteyen true yaparak getirebilir.
                 teklifBaslik.setOncelikliTedarikcilerGelsinMi(false);
+                
+                //Başlangıçta tek tedarikçi kabulu yapılsın istemiyorum
+                //Daha sonra isteyen true yaparak tek tedarikçileri kabul edebilir.
+                teklifBaslik.setTekTedarikciKabuluYapilsinMi(false);
                 
                 teklifBasliklari.add(teklifBaslik);
             }             

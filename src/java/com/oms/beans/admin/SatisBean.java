@@ -236,6 +236,19 @@ public class SatisBean implements Serializable{
         }        
     }
     
+    public void tekTedarikciKabuluSwitchDegisti(TEKLIF_BASLIK teklifBaslik) 
+    {
+        try 
+        {            
+            if(teklifBaslik.isTekTedarikciKabuluYapilsinMi())
+              FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Tek tedarikçi kabulu yapılacağı için tutar alanları güncellenecektir.", ""));
+        } 
+        catch (Exception ex) 
+        {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Tek tedarikçi kabulu ayarlanırken hata oluştu.", ""));
+        }        
+    }
+    
     public String revizeEtSatisTeklifi() 
     {
         try 
@@ -392,7 +405,71 @@ public class SatisBean implements Serializable{
                     {
                         teklifSatir.getSatistanTedarikciKayitlariList().add(satistanTedarikciKayitlari);
                     }                      
+                }        
+                
+                ////////////////////////////////////////////////////////////////////////////////////////////
+                //Eğer sadece 1 (bir) tane tedarikciden fiyat alındıysa
+                //Otomatik olarak o tedarikçi ve verdiği fiyat geçerli olsun...
+                if(secilenTeklifBaslik.isTekTedarikciKabuluYapilsinMi())
+                if(teklifSatir.getSatistanTedarikciKayitlariList().size()==1)
+                {
+                    teklifSatir.setSecilenTedarikciKodu(
+                            teklifSatir.getSatistanTedarikciKayitlariList().get(0).getMusteriMusteriKodu());
+                    teklifSatir.setSecilenTedarikciUnvani(
+                            teklifSatir.getSatistanTedarikciKayitlariList().get(0).getMusteriMusteriUnvani());
+
+                    if(teklifSatir.getKUR() <= 0.0)
+                        teklifSatir.setKUR(1.0);
+                    
+                    //Tedarikçinin verdiği fiyatı kur ile çarpıp TL'ye çeviriyoruz...
+                    //Daha sonra kendi kurumuza bölüp maliyeti hesaplıyoruz...
+                    teklifSatir
+                            .setMALIYET_BIRIM_FIYAT(
+                                    teklifSatir.getSatistanTedarikciKayitlariList().get(0).getTeklifSatirYanitBirimFiyat()
+                                    * teklifSatir.getSatistanTedarikciKayitlariList().get(0).getMailAdresKur()
+                                    / teklifSatir.getKUR());
+                    
+                    
+                    //Maliyeti hesaplıyoruz...
+                    //Eğer marj yok ise direk maliyet birim fiyata eşittir...
+                    if(teklifSatir.getMUSTERI_MARJ()==0.0)
+                       teklifSatir.setMALZEME_HIZMET_MASRAF_BIRIM_FIYATI(teklifSatir.getMALIYET_BIRIM_FIYAT()); 
+                    //Marj sıfır değil ise birimFiyat = maliyet*marj/100
+                    else
+                        teklifSatir
+                                .setMALZEME_HIZMET_MASRAF_BIRIM_FIYATI(
+                                        teklifSatir.getMALIYET_BIRIM_FIYAT() +
+                                        (teklifSatir.getMALIYET_BIRIM_FIYAT()*teklifSatir.getMUSTERI_MARJ()/100)
+                                                       );         
+                    
+                    
+                    teklifSatir
+                    .setMALZEME_HIZMET_MASRAF_TUTARI(
+                    (
+                        (
+                        (teklifSatir.getMUSTERI_MARJ() / 100
+                        * teklifSatir.getSatistanTedarikciKayitlariList().get(0).getTeklifSatirYanitBirimFiyat()
+                        + teklifSatir.getSatistanTedarikciKayitlariList().get(0).getTeklifSatirYanitBirimFiyat())
+                        * teklifSatir.getSatistanTedarikciKayitlariList().get(0).getMailAdresKur()
+                        ) / teklifSatir.getKUR()
+                    )
+                    * teklifSatir.getMUSTERI_SATIS_MIKTAR_YANIT());
+            
+                    teklifSatir.setMalzemeHizmetMasrafTutariCarpiKur(
+                    teklifSatir.getMALZEME_HIZMET_MASRAF_TUTARI() * teklifSatir.getKUR());
+                    
+                    double tutar = 0.0;
+            
+                    for(TEKLIF_SATIR teklifSatir1 :teklifSatirlari)
+                    {
+                        tutar = tutar + (teklifSatir1.getMalzemeHizmetMasrafTutariCarpiKur());
+                    }
+
+                    secilenTeklifBaslik.setTEKLIF_TUTARI(tutar / secilenTeklifBaslik.getTEKLIF_KUR());
+                    secilenTeklifBaslik.setTeklifTutariCarpiKur(tutar);                   
                 }
+                
+                ////////////////////////////////////////////////////////////////////////////////////////////
                 
                 for(TanimliSatisFiyati tanimliSatisFiyati:listeTanimliVeMusteriyeTanimliSatisFiyatiList)
                 {

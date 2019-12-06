@@ -88,6 +88,7 @@ public class TEKLIF_BASLIK {
     private double musteriKarMarji;
 
     private boolean oncelikliTedarikcilerGelsinMi;
+    private boolean tekTedarikciKabuluYapilsinMi;
    
     public double getMusteriKarMarji() {
         return musteriKarMarji;
@@ -544,5 +545,12 @@ public class TEKLIF_BASLIK {
     public void setOncelikliTedarikcilerGelsinMi(boolean oncelikliTedarikcilerGelsinMi) {
         this.oncelikliTedarikcilerGelsinMi = oncelikliTedarikcilerGelsinMi;
     }
-    
+
+    public boolean isTekTedarikciKabuluYapilsinMi() {
+        return tekTedarikciKabuluYapilsinMi;
+    }
+
+    public void setTekTedarikciKabuluYapilsinMi(boolean tekTedarikciKabuluYapilsinMi) {
+        this.tekTedarikciKabuluYapilsinMi = tekTedarikciKabuluYapilsinMi;
+    }
 }

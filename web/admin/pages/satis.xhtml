@@ -32,7 +32,7 @@
             }
             
             .ui-datatable-header {
-                height: 35px
+                height: 20px
             }
             
             .layout-wrapper .topbar {
@@ -68,7 +68,7 @@
           <p:growl id="growl" showDetail="false" sticky="false" escape="false"/>
             <p:dataTable var="teklifBaslik" value="#{satisBean.teklifBasliklari}" 
                          filteredValue="#{satisBean.teklifBasliklariFiltreleme}"
-                         paginator="true" style="font-size:12px;"
+                         paginator="true" style="font-size:10px;"
                          paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                          rows="50"
                          id="teklifBasliklariDataTable"  
@@ -90,8 +90,8 @@
                     <p:commandButton id="toggler" type="button" value="Sütunlar" style="float:right" icon="fa fa-server" />
                     <p:columnToggler datasource="teklifBasliklariDataTable" trigger="toggler" />
                 </f:facet>
-                <p:column headerText="Seç" selectionMode="multiple" style="width:25px;text-align:center"/>
-                <p:column style="width:30px;text-align:center">
+                <p:column headerText="Seç" selectionMode="multiple" style="width:20px;text-align:center"/>
+                <p:column style="width:20px;text-align:center">
                     <f:facet name="header">
                         <h:outputText value="Sıra" />
                     </f:facet>
@@ -99,25 +99,25 @@
                         value="#{index + 1}" />
                 </p:column>
                 <p:column headerText="Teklif No." sortBy="#{teklifBaslik.TEKLIF_NUMARASI}"
-                          style="width:85px;text-align:center" filterBy="#{teklifBaslik.TEKLIF_NUMARASI}" filterMatchMode="contains">
+                          style="width:65px;text-align:center" filterBy="#{teklifBaslik.TEKLIF_NUMARASI}" filterMatchMode="contains">
                     <h:outputText value="#{teklifBaslik.TEKLIF_NUMARASI}-#{teklifBaslik.GECERLI_TEKLIF_REVIZYON_NUMARASI}" />
                 </p:column>
                 <p:column headerText="Teklif Ekleyen" sortBy="#{teklifBaslik.SORUMLU_PERSONEL}"
-                          style="width:80px;text-align:center" filterBy="#{teklifBaslik.SORUMLU_PERSONEL}" filterMatchMode="contains">
+                          style="width:65px;text-align:center" filterBy="#{teklifBaslik.SORUMLU_PERSONEL}" filterMatchMode="contains">
                     <h:outputText value="#{teklifBaslik.SORUMLU_PERSONEL}" />
                 </p:column>
                 <p:column headerText="Satış Elemanı" sortBy="#{teklifBaslik.SATIS_ELEMANI}"
-                          style="width:70px;text-align:center" filterBy="#{teklifBaslik.SATIS_ELEMANI}" filterMatchMode="contains">
+                          style="width:65px;text-align:center" filterBy="#{teklifBaslik.SATIS_ELEMANI}" filterMatchMode="contains">
                     <h:outputText value="#{teklifBaslik.SATIS_ELEMANI}" />
                 </p:column>
                 <p:column headerText="Tarih" sortBy="#{teklifBaslik.TEKLIF_TARIHI}"
-                          style="width:80px;text-align:center">
+                          style="width:55px;text-align:center">
                     <h:outputText value="#{teklifBaslik.TEKLIF_TARIHI}">
-                        <f:convertDateTime pattern="dd.MM.yyyy"/>
+                        <f:convertDateTime pattern="dd.MM.yy"/>
                     </h:outputText>                    
                 </p:column> 
                 <p:column headerText="Tutar" sortBy="#{teklifBaslik.TEKLIF_TUTARI}"
-                          style="width:100px;text-align:center" 
+                          style="width:110px;text-align:center" 
                           filterBy="#{teklifBaslik.TEKLIF_TUTARI}" filterMatchMode="contains">                    
                     <h:outputText value="#{teklifBaslik.TEKLIF_TUTARI}"
                                   rendered="#{teklifBaslik.TEKLIF_PARA_BIRIMI=='1'}"
@@ -157,10 +157,12 @@
                           filterMatchMode="contains">
                     <h:outputText value="#{teklifBaslik.TEKLIF_ACIKLAMA1} #{teklifBaslik.TEKLIF_ACIKLAMA2} #{teklifBaslik.TEKLIF_ACIKLAMA3}" />
                 </p:column>
-                <p:column headerText="Belge No" sortBy="#{teklifBaslik.BELGE_NO}" filterBy="#{teklifBaslik.BELGE_NO}" filterMatchMode="contains">
+                <p:column headerText="Belge No" sortBy="#{teklifBaslik.BELGE_NO}" 
+                          style="width:65px;text-align:center"
+                          filterBy="#{teklifBaslik.BELGE_NO}" filterMatchMode="contains">
                     <h:outputText value="#{teklifBaslik.BELGE_NO}" />
                 </p:column>
-                <p:column headerText="Teslim Yeri" style="width:90px;text-align:center"
+                <p:column headerText="Teslim Yeri" style="width:70px;text-align:center"
                           sortBy="#{teklifBaslik.PROJE_KODU}" filterBy="#{teklifBaslik.PROJE_KODU}" filterMatchMode="contains">
                     <h:outputText value="#{teklifBaslik.PROJE_KODU}" />
                 </p:column>
@@ -178,25 +180,32 @@
                                                       teklifBaslik.TEKLIF_DURUM_KODU eq 99 ? 'green' : 
                                                            teklifBaslik.TEKLIF_DURUM_KODU eq 96 ? 'purple' : null}"/>
                 </p:column>                
-                <p:column style="width:90px;text-align: center" headerText="Detay">
+                <p:column style="width:95px;text-align: center;" headerText="Detay">
                     <p:inputSwitch onLabel="..." offLabel="X" id="oncelikliTedarikcilerSwitch"
-                        value="#{teklifBaslik.oncelikliTedarikcilerGelsinMi}" />
+                        value="#{teklifBaslik.oncelikliTedarikcilerGelsinMi}" >
+                    </p:inputSwitch>
                     <p:inputSwitch onLabel="..." offLabel="X" id="tekTedarikciKabuluSwitch"
-                        value="#{teklifBaslik.oncelikliTedarikcilerGelsinMi}" />
-                    <p:tooltip for="oncelikliTedarikcilerSwitch" value="Öncelikli Tedarikçi"
-                               trackMouse="true" position="top"/>
-                    <p:tooltip for="tekTedarikciKabuluSwitch" value="Tek Tedarikçi Kabulu"
-                               trackMouse="true" position="top"/>
-                    <p:commandButton icon="fa fa-search-plus"
+                                   value="#{teklifBaslik.tekTedarikciKabuluYapilsinMi}" >
+                        <p:ajax listener="#{satisBean.tekTedarikciKabuluSwitchDegisti(teklifBaslik)}" update="@([id$=growl])" />
+                    </p:inputSwitch>
+                    <p:tooltip for="oncelikliTedarikcilerSwitch" value="Öncelikli Tedarikçi Getir"
+                               position="left"/>
+                    <p:tooltip for="tekTedarikciKabuluSwitch" value="Tek Tedarikçi Kabulu Yap"
+                               position="top"/>
+                    <p:tooltip for="detayButon" value="Detay"
+                               position="top"/>
+                    <p:commandButton icon="fa fa-search-plus" id="detayButon"
                                      action="#{satisBean.satisTeklifDetaylariniGetirERPden()}">
                        <f:setPropertyActionListener value="#{teklifBaslik}" target="#{satisBean.secilenTeklifBaslik}" />
                     </p:commandButton>
                 </p:column>
-                <p:column style="width:40px;text-align: center" headerText="Revize">
-                    <p:commandButton icon="fa fa-edit"
+                <p:column style="width:25px;text-align: center" headerText="Revize">
+                    <p:commandButton icon="fa fa-edit" id="revizyonButon"
                                      action="#{satisBean.revizeEtSatisTeklifi()}">
                        <f:setPropertyActionListener value="#{teklifBaslik}" target="#{satisBean.revizeEdilecekTeklifBaslik}" />
                     </p:commandButton>
+                    <p:tooltip for="revizyonButon" value="Detay"
+                               position="top"/>
                 </p:column>
                 <f:facet name="footer">
                     <p:commandButton process="teklifBasliklariDataTable" icon="fa fa-eye-slash" 
