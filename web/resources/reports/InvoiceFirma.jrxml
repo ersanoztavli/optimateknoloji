@@ -3,8 +3,8 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Invoice" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4eedbb89-b4f6-4469-9ab6-f642a1688cf7">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="mssql-jdbc-7.2.1.jre8"/>
-	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="485"/>
-	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="501"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="583"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="403"/>
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="14"/>
@@ -97,6 +97,7 @@ TS.MALZEME_HIZMET_MASRAF_KODU
 ,TS.MUSTERI_SATIS_MIKTAR_YANIT
 ,TS.MALZEME_HIZMET_MASRAF_TUTARI
 ,TS.MALIYET_BIRIM_FIYAT
+,TS.SECILEN_TEDARIKCI_ACIKLAMA
 ,M.MUSTERI_KODU
 ,M.MUSTERI_UNVANI
 FROM TEKLIF_SATIR TS
@@ -130,6 +131,9 @@ WHERE
 	</field>
 	<field name="MALIYET_BIRIM_FIYAT" class="java.lang.Double">
 		<property name="com.jaspersoft.studio.field.label" value="MALIYET_BIRIM_FIYAT"/>
+	</field>
+	<field name="SECILEN_TEDARIKCI_ACIKLAMA" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SECILEN_TEDARIKCI_ACIKLAMA"/>
 	</field>
 	<field name="MUSTERI_KODU" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.label" value="MUSTERI_KODU"/>
@@ -277,7 +281,7 @@ WHERE
 				<text><![CDATA[Kod]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" positionType="Float" mode="Opaque" x="60" y="0" width="160" height="20" forecolor="#FFFFFF" backcolor="#0733F7" uuid="9026ffd5-d1ed-48ba-b46d-7c5da8ccf9d5">
+				<reportElement style="Column header" positionType="Float" mode="Opaque" x="60" y="0" width="140" height="20" forecolor="#FFFFFF" backcolor="#0733F7" uuid="9026ffd5-d1ed-48ba-b46d-7c5da8ccf9d5">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c56e39fb-ae81-4695-9204-b067f6bed3bc"/>
 				</reportElement>
 				<box>
@@ -289,7 +293,7 @@ WHERE
 				<text><![CDATA[Ad]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" positionType="Float" mode="Opaque" x="220" y="0" width="119" height="20" forecolor="#FFFFFF" backcolor="#0733F7" uuid="d28ef9e3-619a-42cf-a3e8-4a72366c2dde">
+				<reportElement style="Column header" positionType="Float" mode="Opaque" x="200" y="0" width="119" height="20" forecolor="#FFFFFF" backcolor="#0733F7" uuid="d28ef9e3-619a-42cf-a3e8-4a72366c2dde">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a106d7f2-9ad6-48fe-9335-75f6955fab88"/>
 				</reportElement>
 				<box>
@@ -303,7 +307,7 @@ WHERE
 				<text><![CDATA[Açıklama]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" positionType="Float" mode="Opaque" x="339" y="0" width="36" height="20" forecolor="#FFFFFF" backcolor="#0733F7" uuid="1a437d44-c4cc-4083-84bf-79045f7d5f04">
+				<reportElement style="Column header" positionType="Float" mode="Opaque" x="319" y="0" width="36" height="20" forecolor="#FFFFFF" backcolor="#0733F7" uuid="1a437d44-c4cc-4083-84bf-79045f7d5f04">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="e9ce97e0-76c7-43e7-b102-214d5bdf52f3"/>
 				</reportElement>
 				<box>
@@ -315,7 +319,7 @@ WHERE
 				<text><![CDATA[Birim]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" positionType="Float" mode="Opaque" x="375" y="0" width="44" height="20" forecolor="#FFFFFF" backcolor="#0733F7" uuid="1b2c912d-831c-4116-bb62-1494e4311e1d">
+				<reportElement style="Column header" positionType="Float" mode="Opaque" x="355" y="0" width="44" height="20" forecolor="#FFFFFF" backcolor="#0733F7" uuid="1b2c912d-831c-4116-bb62-1494e4311e1d">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="df8859b6-376a-4c88-b159-763a53b51066"/>
 				</reportElement>
 				<box>
@@ -327,7 +331,7 @@ WHERE
 				<text><![CDATA[Miktar]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" positionType="Float" mode="Opaque" x="419" y="0" width="57" height="20" forecolor="#FFFFFF" backcolor="#0733F7" uuid="c1ed2c90-25b0-4a06-bc1c-5b0a38f2ba34">
+				<reportElement style="Column header" positionType="Float" mode="Opaque" x="399" y="0" width="41" height="20" forecolor="#FFFFFF" backcolor="#0733F7" uuid="c1ed2c90-25b0-4a06-bc1c-5b0a38f2ba34">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6c1f8644-51c0-40f2-8da5-3f1e8751f0aa"/>
 				</reportElement>
 				<box>
@@ -336,10 +340,10 @@ WHERE
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="10" isBold="true" pdfEncoding="Cp1254"/>
 				</textElement>
-				<text><![CDATA[Birim Fiyat]]></text>
+				<text><![CDATA[Fiyat]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" positionType="Float" mode="Opaque" x="476" y="0" width="58" height="20" forecolor="#FFFFFF" backcolor="#0733F7" uuid="208cc2bd-49e4-46d4-b8b5-ca5ecb79a6e4">
+				<reportElement style="Column header" positionType="Float" mode="Opaque" x="440" y="0" width="58" height="20" forecolor="#FFFFFF" backcolor="#0733F7" uuid="208cc2bd-49e4-46d4-b8b5-ca5ecb79a6e4">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="e44bcc69-d0dd-4f74-8d46-35173c84610e"/>
 				</reportElement>
 				<box>
@@ -351,7 +355,7 @@ WHERE
 				<text><![CDATA[Tutar]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" positionType="Float" mode="Opaque" x="534" y="0" width="40" height="20" forecolor="#FFFFFF" backcolor="#0733F7" uuid="e834bcbc-0247-4f8f-8cdc-dcdda5a14230">
+				<reportElement style="Column header" positionType="Float" mode="Opaque" x="498" y="0" width="40" height="20" forecolor="#FFFFFF" backcolor="#0733F7" uuid="e834bcbc-0247-4f8f-8cdc-dcdda5a14230">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="df8859b6-376a-4c88-b159-763a53b51066"/>
 				</reportElement>
 				<box>
@@ -363,7 +367,7 @@ WHERE
 				<text><![CDATA[Maliyet]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" positionType="Float" mode="Opaque" x="574" y="0" width="60" height="20" forecolor="#FFFFFF" backcolor="#0733F7" uuid="dc2bfcf3-b722-4c7d-924e-877d344b082e">
+				<reportElement style="Column header" positionType="Float" mode="Opaque" x="538" y="0" width="60" height="20" forecolor="#FFFFFF" backcolor="#0733F7" uuid="dc2bfcf3-b722-4c7d-924e-877d344b082e">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6c1f8644-51c0-40f2-8da5-3f1e8751f0aa"/>
 				</reportElement>
 				<box>
@@ -375,13 +379,22 @@ WHERE
 				<text><![CDATA[Ted. Kod]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" positionType="Float" mode="Opaque" x="634" y="0" width="166" height="20" forecolor="#FFFFFF" backcolor="#0733F7" uuid="725f82de-3201-4133-8830-134ddfc7ed4c">
+				<reportElement style="Column header" positionType="Float" mode="Opaque" x="598" y="0" width="120" height="20" forecolor="#FFFFFF" backcolor="#0733F7" uuid="725f82de-3201-4133-8830-134ddfc7ed4c">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="e44bcc69-d0dd-4f74-8d46-35173c84610e"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="10" isBold="true" pdfEncoding="Cp1254"/>
 				</textElement>
 				<text><![CDATA[Ted. Unvan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" positionType="Float" mode="Opaque" x="718" y="0" width="82" height="20" forecolor="#FFFFFF" backcolor="#0733F7" uuid="45035fb3-ab97-4930-bcf5-f6ac4900587d">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="e44bcc69-d0dd-4f74-8d46-35173c84610e"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true" pdfEncoding="Cp1254"/>
+				</textElement>
+				<text><![CDATA[Ted. Açıklama]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
@@ -401,7 +414,7 @@ WHERE
 				<textFieldExpression><![CDATA[$F{MALZEME_HIZMET_MASRAF_KODU}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="Detail" positionType="Float" x="60" y="0" width="160" height="20" uuid="d9e2eeb9-ca5e-455f-b76f-7adbeaeb5fe9">
+				<reportElement style="Detail" positionType="Float" x="60" y="0" width="140" height="20" uuid="d9e2eeb9-ca5e-455f-b76f-7adbeaeb5fe9">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c56e39fb-ae81-4695-9204-b067f6bed3bc"/>
 				</reportElement>
 				<box>
@@ -414,7 +427,7 @@ WHERE
 				<textFieldExpression><![CDATA[$F{MALZEME_HIZMET_MASRAF_ADI}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="Detail" positionType="Float" x="220" y="0" width="119" height="20" uuid="8bab8881-66c2-4a3a-b016-97cfe261be31">
+				<reportElement style="Detail" positionType="Float" x="200" y="0" width="119" height="20" uuid="8bab8881-66c2-4a3a-b016-97cfe261be31">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a106d7f2-9ad6-48fe-9335-75f6955fab88"/>
 				</reportElement>
 				<box>
@@ -427,7 +440,7 @@ WHERE
 				<textFieldExpression><![CDATA[$F{MALZEME_HIZMET_MASRAF_ACIKLAMASI}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="Detail" positionType="Float" x="339" y="0" width="36" height="20" uuid="c14ed418-08e0-4459-afa4-23052ee5dee6">
+				<reportElement style="Detail" positionType="Float" x="319" y="0" width="36" height="20" uuid="c14ed418-08e0-4459-afa4-23052ee5dee6">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="e9ce97e0-76c7-43e7-b102-214d5bdf52f3"/>
 				</reportElement>
 				<box>
@@ -440,7 +453,7 @@ WHERE
 				<textFieldExpression><![CDATA[$F{MALZEME_HIZMET_MASRAF_BIRIM_KODU}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="Detail" positionType="Float" x="375" y="0" width="44" height="20" uuid="60e90fac-c6eb-452c-9210-a44f85cde09b">
+				<reportElement style="Detail" positionType="Float" x="355" y="0" width="44" height="20" uuid="60e90fac-c6eb-452c-9210-a44f85cde09b">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="df8859b6-376a-4c88-b159-763a53b51066"/>
 				</reportElement>
 				<box>
@@ -453,7 +466,7 @@ WHERE
 				<textFieldExpression><![CDATA[$F{MUSTERI_SATIS_MIKTAR_YANIT}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00;#,##0.00" isBlankWhenNull="true">
-				<reportElement style="Detail" positionType="Float" x="419" y="0" width="57" height="20" uuid="855aa9ac-dbd3-43ee-8dd2-fbc2163a5d84">
+				<reportElement style="Detail" positionType="Float" x="399" y="0" width="41" height="20" uuid="855aa9ac-dbd3-43ee-8dd2-fbc2163a5d84">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6c1f8644-51c0-40f2-8da5-3f1e8751f0aa"/>
 				</reportElement>
 				<box>
@@ -466,7 +479,7 @@ WHERE
 				<textFieldExpression><![CDATA[$F{MALZEME_HIZMET_MASRAF_BIRIM_FIYATI}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00;#,##0.00" isBlankWhenNull="true">
-				<reportElement style="Detail" positionType="Float" x="476" y="0" width="58" height="20" uuid="f4b1bc4b-8911-485d-9618-4c24f6de5ff2">
+				<reportElement style="Detail" positionType="Float" x="440" y="0" width="58" height="20" uuid="f4b1bc4b-8911-485d-9618-4c24f6de5ff2">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="e44bcc69-d0dd-4f74-8d46-35173c84610e"/>
 				</reportElement>
 				<box>
@@ -479,7 +492,7 @@ WHERE
 				<textFieldExpression><![CDATA[$F{MALZEME_HIZMET_MASRAF_TUTARI}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="Detail" positionType="Float" x="534" y="0" width="40" height="20" uuid="3d7ba47c-a6d1-4aad-998b-dd6c115629ac">
+				<reportElement style="Detail" positionType="Float" x="498" y="0" width="40" height="20" uuid="3d7ba47c-a6d1-4aad-998b-dd6c115629ac">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="df8859b6-376a-4c88-b159-763a53b51066"/>
 				</reportElement>
 				<box>
@@ -492,7 +505,7 @@ WHERE
 				<textFieldExpression><![CDATA[$F{MALIYET_BIRIM_FIYAT}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00;#,##0.00" isBlankWhenNull="true">
-				<reportElement style="Detail" positionType="Float" x="574" y="0" width="60" height="20" uuid="35c730c1-ca6c-4a8b-87d0-5928de9e312c">
+				<reportElement style="Detail" positionType="Float" x="538" y="0" width="60" height="20" uuid="35c730c1-ca6c-4a8b-87d0-5928de9e312c">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6c1f8644-51c0-40f2-8da5-3f1e8751f0aa"/>
 				</reportElement>
 				<box>
@@ -505,7 +518,7 @@ WHERE
 				<textFieldExpression><![CDATA[$F{MUSTERI_KODU}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00;#,##0.00" isBlankWhenNull="true">
-				<reportElement style="Detail" positionType="Float" x="634" y="0" width="166" height="20" uuid="626b8c82-f7a9-48da-b438-f7e0379fa340">
+				<reportElement style="Detail" positionType="Float" x="598" y="0" width="120" height="20" uuid="626b8c82-f7a9-48da-b438-f7e0379fa340">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="e44bcc69-d0dd-4f74-8d46-35173c84610e"/>
 				</reportElement>
 				<box>
@@ -516,6 +529,19 @@ WHERE
 					<font fontName="Arial" size="7" isBold="false" pdfEncoding="Cp1254"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{MUSTERI_UNVANI}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00;#,##0.00" isBlankWhenNull="true">
+				<reportElement style="Detail" positionType="Float" x="718" y="0" width="82" height="20" uuid="467fca4a-68e2-4427-8eb5-6d0ea983a704">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="e44bcc69-d0dd-4f74-8d46-35173c84610e"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.1"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="false" pdfEncoding="Cp1254"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SECILEN_TEDARIKCI_ACIKLAMA}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

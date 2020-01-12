@@ -58,8 +58,10 @@ public class TEKLIF_SATIR {
     private java.util.Date TESLIM_TARIHI;
     private String MALZEME_HIZMET_MASRAF_ADI2; //İngilizce olan ismi çekebilmek için...    
     private int SECILEN_TEDARIKCI_ID;//Satış teklifi satırını tedarik ediyorsak; ilgili tedarikçiyi kaydemek için...
+    private String SECILEN_TEDARIKCI_ACIKLAMA;
     private double MUSTERI_MARJ;
     private double MALIYET_BIRIM_FIYAT;//Maliyeti hesap edebilmek için...
+       
     
     //Sanal Kolon ama Gerçeğe de dönüştürülebilir
     private double malzemeHizmetMasrafTutariCarpiKur;
@@ -99,10 +101,12 @@ public class TEKLIF_SATIR {
     //Müşteriye tanımlı bir tane gelecek ama listede olan birden fazla olabilir...
     private List<TanimliSatisFiyati> tanimliSatisFiyatiList;   
     
+    private List<TanimliSatinAlmaFiyati> tanimliSatinAlmaFiyatiList;  
+    
     //İlgili satır için son teklif ve satin alma bilgisini tutmak için...
     private SonTeklifVeSatinAlmaSatisSatiri sonTeklifVeSatinAlmaSatisSatiri;
     
-    //Sanal Kolon; satış satırın temin edeceğimiz tedarikçiyi kayıt altına almak için...
+    //Sanal Kolon; satış satırını temin edeceğimiz tedarikçiyi kayıt altına almak için...
     private String secilenTedarikciKodu;
     private String secilenTedarikciUnvani;
     
@@ -604,5 +608,21 @@ public class TEKLIF_SATIR {
     public void setTedarikciListesiFiltreleme(List<TedarikciListSatisSatirBazinda> tedarikciListesiFiltreleme) {
         this.tedarikciListesiFiltreleme = tedarikciListesiFiltreleme;
     }    
+
+    public String getSECILEN_TEDARIKCI_ACIKLAMA() {
+        return SECILEN_TEDARIKCI_ACIKLAMA;
+    }
+
+    public void setSECILEN_TEDARIKCI_ACIKLAMA(String SECILEN_TEDARIKCI_ACIKLAMA) {
+        this.SECILEN_TEDARIKCI_ACIKLAMA = SECILEN_TEDARIKCI_ACIKLAMA;
+    }    
+
+    public List<TanimliSatinAlmaFiyati> getTanimliSatinAlmaFiyatiList() {
+        return tanimliSatinAlmaFiyatiList;
+    }
+
+    public void setTanimliSatinAlmaFiyatiList(List<TanimliSatinAlmaFiyati> tanimliSatinAlmaFiyatiList) {
+        this.tanimliSatinAlmaFiyatiList = tanimliSatinAlmaFiyatiList;
+    }
     
 }

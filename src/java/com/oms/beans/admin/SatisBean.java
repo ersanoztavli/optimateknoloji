@@ -16,6 +16,7 @@ import com.oms.models.SatisSatiriAtanmisTedarikci;
 import com.oms.models.SonTeklifVeSatinAlmaSatisSatiri;
 import com.oms.models.TEKLIF_BASLIK;
 import com.oms.models.TEKLIF_SATIR;
+import com.oms.models.TanimliSatinAlmaFiyati;
 import com.oms.models.TanimliSatisFiyati;
 import com.oms.models.TedarikciListSatisSatirBazinda;
 import java.io.BufferedReader;
@@ -319,7 +320,11 @@ public class SatisBean implements Serializable{
                     satisDao.getirFiiliStokSatirTumu(secilenTeklifBaslik.getERP_FIRMA_NUMBER(), secilenTeklifBaslik.getRECORD_ID());
                        
             List<SATISTAN_TEDARIKCI_KAYITLARI> satistanTedarikciKayitlariList = 
-                    satisDao.getirSatistanTedarikciKayitlariSatirTumu(secilenTeklifBaslik.getRECORD_ID());
+                    satisDao.getirSatistanTedarikciKayitlariSatirTumu(secilenTeklifBaslik.getRECORD_ID());            
+            
+            List<TanimliSatinAlmaFiyati> listeTanimliSatinAlmaFiyatiList = 
+                    satisDao.getirListeTanimliSatinAlmaFiyati(secilenTeklifBaslik.getERP_FIRMA_NUMBER(), 
+                                                              secilenTeklifBaslik.getRECORD_ID());
             
             List<TanimliSatisFiyati> listeTanimliSatisFiyatiList = 
                     satisDao.getirListeTanimliSatisFiyati(secilenTeklifBaslik.getERP_FIRMA_NUMBER(), 
@@ -335,9 +340,18 @@ public class SatisBean implements Serializable{
             
             int sayac = 0;
             
+            //Satış fiyatı için sanalId;
             for(TanimliSatisFiyati tanimliSatisFiyati : listeTanimliVeMusteriyeTanimliSatisFiyatiList)
             {
                 tanimliSatisFiyati.setSanalId(++sayac);
+            }
+            
+            sayac = 0;
+            
+            //Satın alma fiyatı için sanalId;
+            for(TanimliSatinAlmaFiyati tanimliSatinAlmaFiyati : listeTanimliSatinAlmaFiyatiList)
+            {
+                tanimliSatinAlmaFiyati.setSanalId(++sayac);
             }
             
             List<SonTeklifVeSatinAlmaSatisSatiri> sonTeklifVeSatinAlmaSatisSatiriList = 
@@ -348,6 +362,7 @@ public class SatisBean implements Serializable{
             for(TEKLIF_SATIR teklifSatir : teklifSatirlari)
             {
                 teklifSatir.setTanimliSatisFiyatiList(new ArrayList<>());
+                teklifSatir.setTanimliSatinAlmaFiyatiList(new ArrayList<>());
                 teklifSatir.setTedarikciListesi(new ArrayList<>());
                 teklifSatir.setSatistanTedarikciKayitlariList(new ArrayList<>());
                 teklifSatir.setSonTeklifVeSatinAlmaSatisSatiri(new SonTeklifVeSatinAlmaSatisSatiri());
@@ -417,7 +432,9 @@ public class SatisBean implements Serializable{
                             teklifSatir.getSatistanTedarikciKayitlariList().get(0).getMusteriMusteriKodu());
                     teklifSatir.setSecilenTedarikciUnvani(
                             teklifSatir.getSatistanTedarikciKayitlariList().get(0).getMusteriMusteriUnvani());
-
+                    teklifSatir.setSECILEN_TEDARIKCI_ACIKLAMA(
+                            teklifSatir.getSatistanTedarikciKayitlariList().get(0).getTeklifSatirYanitAciklama());
+                    
                     if(teklifSatir.getKUR() <= 0.0)
                         teklifSatir.setKUR(1.0);
                     
@@ -477,6 +494,12 @@ public class SatisBean implements Serializable{
                         teklifSatir.getTanimliSatisFiyatiList().add(tanimliSatisFiyati);
                 }
                 
+                for(TanimliSatinAlmaFiyati tanimliSatinAlmaFiyati:listeTanimliSatinAlmaFiyatiList)
+                {
+                    if(teklifSatir.getTEKLIF_SATIR_ID() == tanimliSatinAlmaFiyati.getTeklifSatirId())
+                        teklifSatir.getTanimliSatinAlmaFiyatiList().add(tanimliSatinAlmaFiyati);
+                }
+                
                 for(SonTeklifVeSatinAlmaSatisSatiri sonTeklifVeSatinAlmaSatisSatiri : sonTeklifVeSatinAlmaSatisSatiriList)
                 {
                     if(teklifSatir.getTEKLIF_SATIR_ID() == sonTeklifVeSatinAlmaSatisSatiri.getTeklifSatirId())
@@ -503,6 +526,7 @@ public class SatisBean implements Serializable{
          //maliyeti elle girdiğimiz için seçilen tedarikçi bilgisi silinecek
          teklifSatir.setSecilenTedarikciKodu(null);
          teklifSatir.setSecilenTedarikciUnvani(null);
+         teklifSatir.setSECILEN_TEDARIKCI_ACIKLAMA("");
          
          //////////////////////////////////////////////
          //Maliyeti hesaplıyoruz...
@@ -545,51 +569,71 @@ public class SatisBean implements Serializable{
         {
           if(teklifSatir.getTEKLIF_SATIR_ID() == 
                   ((TanimliSatisFiyati) event.getObject()).getTeklifSatirId())
-          {
-            //Listeden seçim yaptığımız için tedarikçi kolonu bilgisini kaldırıyoruz...
-            teklifSatir.setSecilenTedarikciKodu(null);
-            teklifSatir.setSecilenTedarikciUnvani(null);
-            
+          {  
             teklifSatir.setMALIYET_BIRIM_FIYAT(((TanimliSatisFiyati) event.getObject()).getFiyat()) ;
-            //////////////////////////////////////////////
-            //Maliyeti hesaplıyoruz...
-            //Eğer marj yok ise direk maliyet birim fiyata eşittir...
-            if(teklifSatir.getMUSTERI_MARJ()==0.0)
-               teklifSatir.setMALZEME_HIZMET_MASRAF_BIRIM_FIYATI(teklifSatir.getMALIYET_BIRIM_FIYAT()); 
-            //Marj sıfır değil ise birimFiyat = maliyet*marj/100
-            else
-                teklifSatir
-                        .setMALZEME_HIZMET_MASRAF_BIRIM_FIYATI(
-                                teklifSatir.getMALIYET_BIRIM_FIYAT() +
-                                (teklifSatir.getMALIYET_BIRIM_FIYAT()*teklifSatir.getMUSTERI_MARJ()/100)
-                                               );         
-            //////////////////////////////////////////////
-            
-            //teklifSatir.setMALZEME_HIZMET_MASRAF_BIRIM_FIYATI(((TanimliSatisFiyati) event.getObject()).getFiyat()) ;
-            teklifSatir.setMALZEME_HIZMET_MASRAF_TUTARI(
-                    teklifSatir.getMALZEME_HIZMET_MASRAF_BIRIM_FIYATI() 
-                  * teklifSatir.getMUSTERI_SATIS_MIKTAR_YANIT());
-            
-            if(teklifSatir.getKUR() <= 0.0)
-                teklifSatir.setKUR(1.0);
-            
-            teklifSatir.setMalzemeHizmetMasrafTutariCarpiKur(
-                    teklifSatir.getMALZEME_HIZMET_MASRAF_TUTARI() * teklifSatir.getKUR());
-            
-            double tutar = 0.0;
-            
-            for(TEKLIF_SATIR teklifSatir1 :teklifSatirlari)
-            {
-                tutar = tutar + (teklifSatir1.getMalzemeHizmetMasrafTutariCarpiKur());
-            }
-            
-            secilenTeklifBaslik.setTEKLIF_TUTARI(tutar / secilenTeklifBaslik.getTEKLIF_KUR());
-            secilenTeklifBaslik.setTeklifTutariCarpiKur(tutar);
-            
+            tanimliFiyatDegisti(teklifSatir);            
             break;
           }
         }
     }
+    
+    public void tanimliSatinAlmaFiyatiDegisti(SelectEvent event) 
+    {
+        for(TEKLIF_SATIR teklifSatir :teklifSatirlari)
+        {
+          if(teklifSatir.getTEKLIF_SATIR_ID() == 
+                  ((TanimliSatinAlmaFiyati) event.getObject()).getTeklifSatirId())
+          {
+            teklifSatir.setMALIYET_BIRIM_FIYAT(((TanimliSatinAlmaFiyati) event.getObject()).getFiyat()) ;
+            tanimliFiyatDegisti(teklifSatir);            
+            break;
+          }
+        }
+    }
+    
+    public void tanimliFiyatDegisti(TEKLIF_SATIR teklifSatir)
+    {
+         //Listeden seçim yaptığımız için tedarikçi kolonu bilgisini kaldırıyoruz...
+        teklifSatir.setSecilenTedarikciKodu(null);
+        teklifSatir.setSecilenTedarikciUnvani(null);
+        teklifSatir.setSECILEN_TEDARIKCI_ACIKLAMA("");
+        
+        //////////////////////////////////////////////
+        //Maliyeti hesaplıyoruz...
+        //Eğer marj yok ise direk maliyet birim fiyata eşittir...
+        if(teklifSatir.getMUSTERI_MARJ()==0.0)
+           teklifSatir.setMALZEME_HIZMET_MASRAF_BIRIM_FIYATI(teklifSatir.getMALIYET_BIRIM_FIYAT()); 
+        //Marj sıfır değil ise birimFiyat = maliyet*marj/100
+        else
+            teklifSatir
+                    .setMALZEME_HIZMET_MASRAF_BIRIM_FIYATI(
+                            teklifSatir.getMALIYET_BIRIM_FIYAT() +
+                            (teklifSatir.getMALIYET_BIRIM_FIYAT()*teklifSatir.getMUSTERI_MARJ()/100)
+                                           );         
+        //////////////////////////////////////////////
+            
+        //teklifSatir.setMALZEME_HIZMET_MASRAF_BIRIM_FIYATI(((TanimliSatisFiyati) event.getObject()).getFiyat()) ;
+        teklifSatir.setMALZEME_HIZMET_MASRAF_TUTARI(
+                teklifSatir.getMALZEME_HIZMET_MASRAF_BIRIM_FIYATI() 
+              * teklifSatir.getMUSTERI_SATIS_MIKTAR_YANIT());
+
+        if(teklifSatir.getKUR() <= 0.0)
+            teklifSatir.setKUR(1.0);
+
+        teklifSatir.setMalzemeHizmetMasrafTutariCarpiKur(
+                teklifSatir.getMALZEME_HIZMET_MASRAF_TUTARI() * teklifSatir.getKUR());
+
+        double tutar = 0.0;
+
+        for(TEKLIF_SATIR teklifSatir1 :teklifSatirlari)
+        {
+            tutar = tutar + (teklifSatir1.getMalzemeHizmetMasrafTutariCarpiKur());
+        }
+
+        secilenTeklifBaslik.setTEKLIF_TUTARI(tutar / secilenTeklifBaslik.getTEKLIF_KUR());
+        secilenTeklifBaslik.setTeklifTutariCarpiKur(tutar);
+    }
+    
     
     public void contextMenu(SelectEvent event) 
     {
@@ -607,6 +651,9 @@ public class SatisBean implements Serializable{
                     ((SATISTAN_TEDARIKCI_KAYITLARI) event.getObject()).getMusteriMusteriKodu());
             teklifSatir.setSecilenTedarikciUnvani(
                     ((SATISTAN_TEDARIKCI_KAYITLARI) event.getObject()).getMusteriMusteriUnvani());
+            teklifSatir.setSECILEN_TEDARIKCI_ACIKLAMA(
+                    ((SATISTAN_TEDARIKCI_KAYITLARI) event.getObject()).getTeklifSatirYanitAciklama());
+            
             
             if(teklifSatir.getKUR() <= 0.0)
                 teklifSatir.setKUR(1.0);
@@ -792,6 +839,7 @@ public class SatisBean implements Serializable{
               {
                 teklifSatir.setSecilenTedarikciKodu(null);
                 teklifSatir.setSecilenTedarikciUnvani(null);
+                teklifSatir.setSECILEN_TEDARIKCI_ACIKLAMA("");
               }
             } 
          } 
@@ -1337,6 +1385,7 @@ public class SatisBean implements Serializable{
                         ((TedarikciListSatisSatirBazinda) event.getObject()).getMusteriKodu());
                 teklifSatir.setSecilenTedarikciUnvani(
                         ((TedarikciListSatisSatirBazinda) event.getObject()).getMusteriUnvani());
+                teklifSatir.setSECILEN_TEDARIKCI_ACIKLAMA("");
               }
             }            
         } 

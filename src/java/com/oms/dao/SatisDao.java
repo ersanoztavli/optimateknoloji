@@ -15,6 +15,7 @@ import com.oms.models.SATISTAN_TEDARIKCI_KAYITLARI;
 import com.oms.models.SonTeklifVeSatinAlmaSatisSatiri;
 import com.oms.models.TEKLIF_BASLIK;
 import com.oms.models.TEKLIF_SATIR;
+import com.oms.models.TanimliSatinAlmaFiyati;
 import com.oms.models.TanimliSatisFiyati;
 import com.oms.models.TedarikciListSatisSatirBazinda;
 import java.io.OutputStream;
@@ -1226,9 +1227,7 @@ public class SatisDao {
                                  + " AND M.KULLANIM_DURUMU = 1"
                      + " WHERE TS.KULLANIM_DURUMU = 1 "
                      + " AND TS.TEKLIF_BASLIK_RECORD_ID = ? " 
-                     + " AND TS.ERP_FIRMA_NUMBER = ? ";
-        
-        
+                     + " AND TS.ERP_FIRMA_NUMBER = ? ";     
         
         preparedStatement = connection.prepareStatement(query);
         List<TEKLIF_SATIR> teklifSatirlari = new ArrayList<>();
@@ -1270,6 +1269,7 @@ public class SatisDao {
                 teklifSatir.setMUSTERI_MARJ(resultSet.getDouble("MUSTERI_MARJ"));
                 
                 teklifSatir.setMALIYET_BIRIM_FIYAT(resultSet.getDouble("MALIYET_BIRIM_FIYAT")); 
+                teklifSatir.setSECILEN_TEDARIKCI_ACIKLAMA(resultSet.getString("SECILEN_TEDARIKCI_ACIKLAMA"));
                                 
                 teklifSatirlari.add(teklifSatir);
             }
@@ -1746,7 +1746,7 @@ public class SatisDao {
         String query = " SELECT "
                      + " ITM.CODE, ITM.NAME, ITM.NAME3, UNI.CODE AS BIRIM "
                      + " FROM LG_" + ERPFirmaNoTemp + "_ITEMS ITM "
-                     + " LEFT OUTER JOIN LG_022_UNITSETL UNI ON ITM.UNITSETREF = UNI.UNITSETREF"
+                     + " LEFT OUTER JOIN LG_" + ERPFirmaNoTemp + "_UNITSETL UNI ON ITM.UNITSETREF = UNI.UNITSETREF"
                                  + " AND UNI.LINENR = 1 "
                      + " WHERE ITM.ACTIVE = 0 "
                      + " AND ITM.CODE = '" + kod + "'";
@@ -2410,6 +2410,82 @@ public class SatisDao {
         }
     }
     
+    public List<TanimliSatinAlmaFiyati> getirListeTanimliSatinAlmaFiyati(String ERPFirmaNo
+                                                                ,String teklifBaslikRecordId) throws Exception
+    {   
+            List<TanimliSatinAlmaFiyati> tanimliSatinAlmaFiyatiList = new ArrayList<>();         
+            
+            DbConnection dbConnection = new DbConnection();
+            Connection connectionERP = dbConnection.baglantiAcERP();
+            PreparedStatement preparedStatementERP = null;
+
+            String ERPFirmaNoTemp = "";
+
+            if(ERPFirmaNo.length() == 1)
+                    ERPFirmaNoTemp = "00" + ERPFirmaNo;
+                else if(ERPFirmaNo.length() == 2)
+                ERPFirmaNoTemp = "0" + ERPFirmaNo;
+            
+             String queryERP = " SELECT " +
+                               " TABLO1.TEKLIF_SATIR_ID " +
+                               " ,PRC.PRICE " +
+                               " FROM ( SELECT ITM.LOGICALREF " +
+                                             " ,ITM.CODE " + 
+                                             " ,ITM.NAME " +
+                                             " ,TABLO2.MALZEME_HIZMET_MASRAF_BIRIM_KODU " +
+                                             " ,TABLO2.PARA_BIRIMI " +
+                                             " ,TABLO2.TEKLIF_SATIR_ID " +  
+                                      " FROM (SELECT " +
+                                            " TEKLIF_SATIR_ID " + 
+                                            " ,MALZEME_HIZMET_MASRAF_KODU " +
+                                            " ,MALZEME_HIZMET_MASRAF_BIRIM_KODU " +
+                                            " ,PARA_BIRIMI " +
+                                            " FROM " + dbConnection.getDbName() + ".dbo.TEKLIF_SATIR " +
+                                            " WHERE TEKLIF_BASLIK_RECORD_ID = '" + teklifBaslikRecordId + "' " +
+                                           " )TABLO2 " +
+                                      " LEFT OUTER JOIN LG_" + ERPFirmaNoTemp + "_ITEMS ITM ON ITM.CODE = TABLO2.MALZEME_HIZMET_MASRAF_KODU " +
+                                                  " AND ITM.ACTIVE = 0 " +
+                                     " )TABLO1 " +
+                               " LEFT OUTER JOIN LG_" + ERPFirmaNoTemp + "_PRCLIST PRC WITH(NOLOCK) ON TABLO1.LOGICALREF = PRC.CARDREF " + 
+                                           " AND PRC.CURRENCY = TABLO1.PARA_BIRIMI " +
+                                           " AND PRC.PTYPE = 1 " + 
+                                           " AND PRC.ACTIVE = 0 " +
+                                           " AND PRC.ENDDATE > GETDATE() " + 
+                                           " AND PRC.PRICE > 0 " ;           
+            
+        try 
+        {
+            preparedStatementERP = connectionERP.prepareStatement(queryERP);
+            ResultSet resultSetERP = preparedStatementERP.executeQuery();
+            
+            while(resultSetERP.next())
+            {
+                TanimliSatinAlmaFiyati tanimliSatinAlmaFiyati = new TanimliSatinAlmaFiyati();
+                tanimliSatinAlmaFiyati.setTeklifSatirId(resultSetERP.getInt("TEKLIF_SATIR_ID"));
+                tanimliSatinAlmaFiyati.setFiyat(resultSetERP.getDouble("PRICE")); 
+                tanimliSatinAlmaFiyati.setSecildiMi(false);
+                
+                tanimliSatinAlmaFiyatiList.add(tanimliSatinAlmaFiyati);
+            }
+                        
+        }
+        catch (Exception ex) 
+        {
+            System.out.println(ex);
+        }
+        finally
+        {
+            dbConnection.baglantiKapatERP();   
+            if(preparedStatementERP!=null)
+            { 
+              preparedStatementERP.close();
+            }            
+            return tanimliSatinAlmaFiyatiList;
+        }
+    }
+    
+    
+    
     public List<TanimliSatisFiyati> getirMusteriyeTanimliSatisFiyati(String ERPFirmaNo
                                                                     ,String teklifBaslikRecordId) throws Exception
     {   
@@ -2513,12 +2589,11 @@ public class SatisDao {
              String queryERP =  " SELECT " +
                                     " TABLO1.TEKLIF_SATIR_ID " +
                                     " ,ISNULL((SELECT TOP 1 " + 
-                                             " STR( " +
-                                                 " CASE " +
-                                                     " WHEN STL.TRCURR NOT IN (0,160) THEN STL.LINENET / STL.AMOUNT / STL.TRRATE " +
-                                                     " ELSE STL.LINENET / STL.AMOUNT " +
-                                                     " END " +
-                                                     " , 25, 3) " +
+                                             " STR(CASE " +
+                                                 " WHEN STL.TRCURR NOT IN (0,160) THEN STL.LINENET / STL.AMOUNT / STL.TRRATE " +
+                                                 " ELSE STL.LINENET / STL.AMOUNT " +
+                                                 " END  , 25, 3) " +
+                                                 " + '__' + CONVERT(VARCHAR(10), STL.TRCURR) " +
                                                      " + '__' + CONVERT(VARCHAR, STL.DATE_, 4)  " +
                                                      " + '__' + CLC.CODE " +
                                                      " + '_' + CLC.DEFINITION_ " +
@@ -2533,12 +2608,13 @@ public class SatisDao {
                                                                             " AND STL.LINETYPE = 0 " +
                                                                             " AND STL.TRCODE = 1 " +  
                                                                             " AND STL.INVOICEREF > 0 " +
-                                                                            " AND STL.TRCURR = TABLO1.PARA_BIRIMI " +
+//                                                                            " AND STL.TRCURR = TABLO1.PARA_BIRIMI " +
                                                                         " ORDER BY STL.DATE_ DESC " +
                                                                      " ) " +
-                                    " ),0) AS SATIN_ALMA_FIYAT_TARIH_CARI_KOD_UNVAN " + 
+                                            " ),0) AS SATIN_ALMA_FIYAT_PBIRIMI_TARIH_CARI_KOD_UNVAN " + 
                                     " ,ISNULL((SELECT TOP 1 " + 
                                                 " STR(TSY.BIRIM_FIYATI, 25, 3) " +
+                                                " + '__' + CONVERT(VARCHAR(10), MA.PARA_BIRIMI) + " +
                                                 " + '__' + CONVERT(VARCHAR, TSY.GUNCELLEME_TARIHI, 4) " + 
                                                 " + '__' + M.MUSTERI_KODU " + 
                                                 " + '_' + M.MUSTERI_UNVANI " + 
@@ -2546,10 +2622,11 @@ public class SatisDao {
                                             " LEFT OUTER JOIN " + dbConnection.getDbName() + ".dbo.MAIL_ADRES MA ON MA.MAIL_ADRES_ID = TSY.MAIL_ADRES_ID " + 
                                             " LEFT OUTER JOIN " + dbConnection.getDbName() + ".dbo.TEKLIF_SATIR TS ON TS.TEKLIF_SATIR_ID = TSY.TEKLIF_SATIR_ID " + 
                                             " LEFT OUTER JOIN " + dbConnection.getDbName() + ".dbo.MUSTERI M ON M.RECORD_ID = MA.MUSTERI_RECORD_ID " + 
-                                            " WHERE MA.PARA_BIRIMI = TABLO1.PARA_BIRIMI_STR " + 
-                                              " AND TS.MALZEME_HIZMET_MASRAF_KODU = TABLO1.CODE	" + 
+//                                            " WHERE MA.PARA_BIRIMI = TABLO1.PARA_BIRIMI_STR " + 
+//                                              " AND TS.MALZEME_HIZMET_MASRAF_KODU = TABLO1.CODE	" + 
+                                            " WHERE TS.MALZEME_HIZMET_MASRAF_KODU = TABLO1.CODE	" +
                                             " ORDER BY TSY.GUNCELLEME_TARIHI DESC " + 
-                                    " ),0) AS TEKLIF_FIYAT_TARIH_CARI_KOD_UNVAN " + 
+                                            " ),0) AS TEKLIF_FIYAT_PBIRIMI_TARIH_CARI_KOD_UNVAN " + 
                                 " FROM " +
                                 " ( " +
                                 " SELECT " +
@@ -2585,27 +2662,36 @@ public class SatisDao {
                     SonTeklifVeSatinAlmaSatisSatiri sonTeklifVeSatinAlmaSatisSatiri = 
                             new SonTeklifVeSatinAlmaSatisSatiri();
                                         
-                    String SATIN_ALMA_FIYAT_TARIH_CARI_KOD_UNVAN = "";
-                    String TEKLIF_FIYAT_TARIH_CARI_KOD_UNVAN = "";
+                    String SATIN_ALMA_FIYAT_PBIRIMI_TARIH_CARI_KOD_UNVAN = "";
+                    String TEKLIF_FIYAT_PBIRIMI_TARIH_CARI_KOD_UNVAN = "";
                     
-                    SATIN_ALMA_FIYAT_TARIH_CARI_KOD_UNVAN = resultSetERP.getString("SATIN_ALMA_FIYAT_TARIH_CARI_KOD_UNVAN"); 
-                    TEKLIF_FIYAT_TARIH_CARI_KOD_UNVAN = resultSetERP.getString("TEKLIF_FIYAT_TARIH_CARI_KOD_UNVAN"); 
+                    SATIN_ALMA_FIYAT_PBIRIMI_TARIH_CARI_KOD_UNVAN = resultSetERP.getString("SATIN_ALMA_FIYAT_PBIRIMI_TARIH_CARI_KOD_UNVAN"); 
+                    TEKLIF_FIYAT_PBIRIMI_TARIH_CARI_KOD_UNVAN = resultSetERP.getString("TEKLIF_FIYAT_PBIRIMI_TARIH_CARI_KOD_UNVAN"); 
                     
                     sonTeklifVeSatinAlmaSatisSatiri.setTeklifSatirId(resultSetERP.getInt("TEKLIF_SATIR_ID"));
                     
                     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    if(!SATIN_ALMA_FIYAT_TARIH_CARI_KOD_UNVAN.equals("0"))
+                    if(!SATIN_ALMA_FIYAT_PBIRIMI_TARIH_CARI_KOD_UNVAN.equals("0"))
                     {
                       //Önce boşlukları atıyoruz....
-                      SATIN_ALMA_FIYAT_TARIH_CARI_KOD_UNVAN = SATIN_ALMA_FIYAT_TARIH_CARI_KOD_UNVAN.trim();
+                      SATIN_ALMA_FIYAT_PBIRIMI_TARIH_CARI_KOD_UNVAN = SATIN_ALMA_FIYAT_PBIRIMI_TARIH_CARI_KOD_UNVAN.trim();
                       
-                      String degerler[] = SATIN_ALMA_FIYAT_TARIH_CARI_KOD_UNVAN.split("__");
+                      String degerler[] = SATIN_ALMA_FIYAT_PBIRIMI_TARIH_CARI_KOD_UNVAN.split("__");
                       
-                      String sonSatinAlmaFiyati = degerler[0];                            
-                      String sonSatinAlmaTarihi = degerler[1];
-                      String sonSatinAlmaCari = degerler[2];
+                      String sonSatinAlmaFiyati = degerler[0];   
+                      String sonSatinAlmaParaBirimi = degerler[1];
+                      String sonSatinAlmaTarihi = degerler[2];
+                      String sonSatinAlmaCari = degerler[3];
                       
                       sonTeklifVeSatinAlmaSatisSatiri.setSonSatinAlmaFiyati(Double.valueOf(sonSatinAlmaFiyati));
+                      
+                      if(sonSatinAlmaParaBirimi.equals("0")||sonSatinAlmaParaBirimi.equals("160"))
+                          sonSatinAlmaParaBirimi="TL";
+                      else if(sonSatinAlmaParaBirimi.equals("1"))
+                          sonSatinAlmaParaBirimi="USD";
+                      else if(sonSatinAlmaParaBirimi.equals("20"))
+                          sonSatinAlmaParaBirimi="EUR";
+                      sonTeklifVeSatinAlmaSatisSatiri.setSonSatinAlmaParaBirimi(sonSatinAlmaParaBirimi);
                       
                       SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yy");
                       sonTeklifVeSatinAlmaSatisSatiri.setSonSatinAlmaTarihi(formatter.parse(sonSatinAlmaTarihi));
@@ -2615,22 +2701,26 @@ public class SatisDao {
                     else
                     {
                       sonTeklifVeSatinAlmaSatisSatiri.setSonSatinAlmaFiyati(0.0);
+                      sonTeklifVeSatinAlmaSatisSatiri.setSonSatinAlmaParaBirimi("-");
                       sonTeklifVeSatinAlmaSatisSatiri.setSonSatinAlmaTarihi(null);                        
                       sonTeklifVeSatinAlmaSatisSatiri.setSonSatinAlmaCari("-");
                     }
                     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    if(!TEKLIF_FIYAT_TARIH_CARI_KOD_UNVAN.equals("0"))
+                    if(!TEKLIF_FIYAT_PBIRIMI_TARIH_CARI_KOD_UNVAN.equals("0"))
                     {
                       //Önce boşlukları atıyoruz....
-                      TEKLIF_FIYAT_TARIH_CARI_KOD_UNVAN = TEKLIF_FIYAT_TARIH_CARI_KOD_UNVAN.trim();  
+                      TEKLIF_FIYAT_PBIRIMI_TARIH_CARI_KOD_UNVAN = TEKLIF_FIYAT_PBIRIMI_TARIH_CARI_KOD_UNVAN.trim();  
                       
-                      String degerler[] = TEKLIF_FIYAT_TARIH_CARI_KOD_UNVAN.split("__");
+                      String degerler[] = TEKLIF_FIYAT_PBIRIMI_TARIH_CARI_KOD_UNVAN.split("__");
                       
-                      String sonTeklifFiyati = degerler[0];                            
-                      String sonTeklifTarihi = degerler[1];
-                      String sonTeklifCari = degerler[2];
+                      String sonTeklifFiyati = degerler[0]; 
+                      String sonTeklifParaBirimi = degerler[1];
+                      String sonTeklifTarihi = degerler[2];
+                      String sonTeklifCari = degerler[3];
                       
                       sonTeklifVeSatinAlmaSatisSatiri.setSonSatinAlmaTeklifFiyati(Double.valueOf(sonTeklifFiyati));
+                      
+                      sonTeklifVeSatinAlmaSatisSatiri.setSonTeklifParaBirimi(sonTeklifParaBirimi);
                       
                       SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yy");
                       sonTeklifVeSatinAlmaSatisSatiri.setSonSatinAlmaTeklifTarihi(formatter.parse(sonTeklifTarihi));
@@ -2640,6 +2730,7 @@ public class SatisDao {
                     else
                     {
                       sonTeklifVeSatinAlmaSatisSatiri.setSonSatinAlmaTeklifFiyati(0.0);
+                      sonTeklifVeSatinAlmaSatisSatiri.setSonTeklifParaBirimi("-");
                       sonTeklifVeSatinAlmaSatisSatiri.setSonSatinAlmaTeklifTarihi(null);                         
                       sonTeklifVeSatinAlmaSatisSatiri.setSonTeklifCari("-");
                     }
@@ -4002,6 +4093,7 @@ public class SatisDao {
                                 + " ,MUSTERI_MARJ =  ? "
                                 + " ,MALIYET_BIRIM_FIYAT =  ? "
                                 + " ,MALZEME_HIZMET_MASRAF_KODU =  ? "
+                                + " ,SECILEN_TEDARIKCI_ACIKLAMA =  ? "
                                 + " WHERE TEKLIF_SATIR_ID = ? " ;
                         
             for(TEKLIF_SATIR  teklifSatiri : teklifSatirlari)
@@ -4018,7 +4110,8 @@ public class SatisDao {
                 preparedStatement2.setDouble(4, teklifSatiri.getMUSTERI_MARJ());
                 preparedStatement2.setDouble(5, teklifSatiri.getMALIYET_BIRIM_FIYAT());
                 preparedStatement2.setString(6, teklifSatiri.getMALZEME_HIZMET_MASRAF_KODU());
-                preparedStatement2.setInt(7, teklifSatiri.getTEKLIF_SATIR_ID());
+                preparedStatement2.setString(7, teklifSatiri.getSECILEN_TEDARIKCI_ACIKLAMA());
+                preparedStatement2.setInt(8, teklifSatiri.getTEKLIF_SATIR_ID());
                 preparedStatement2.executeUpdate();
             }
         }

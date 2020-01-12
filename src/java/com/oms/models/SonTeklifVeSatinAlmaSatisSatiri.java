@@ -15,6 +15,8 @@ public class SonTeklifVeSatinAlmaSatisSatiri {
     
     private java.util.Date sonSatinAlmaTeklifTarihi;
     private double sonSatinAlmaTeklifFiyati;
+    private String sonSatinAlmaParaBirimi;
+    private String sonTeklifParaBirimi;
     private java.util.Date sonSatinAlmaTarihi;
     private double sonSatinAlmaFiyati;
     private int teklifSatirId;
@@ -75,6 +77,22 @@ public class SonTeklifVeSatinAlmaSatisSatiri {
 
     public void setSonTeklifCari(String sonTeklifCari) {
         this.sonTeklifCari = sonTeklifCari;
+    }    
+
+    public String getSonSatinAlmaParaBirimi() {
+        return sonSatinAlmaParaBirimi;
+    }
+
+    public void setSonSatinAlmaParaBirimi(String sonSatinAlmaParaBirimi) {
+        this.sonSatinAlmaParaBirimi = sonSatinAlmaParaBirimi;
+    }
+
+    public String getSonTeklifParaBirimi() {
+        return sonTeklifParaBirimi;
+    }
+
+    public void setSonTeklifParaBirimi(String sonTeklifParaBirimi) {
+        this.sonTeklifParaBirimi = sonTeklifParaBirimi;
     }    
     
 }

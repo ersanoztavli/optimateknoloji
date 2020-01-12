@@ -143,8 +143,7 @@
                         </h:outputText>
                         
                         <p:commandButton value="Kur:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/>
-                        <h:outputLabel id="kur" value="#{satisBean.secilenTeklifBaslik.TEKLIF_KUR}" style="font-size:14px;">
-                            <f:convertNumber type="currency" currencySymbol=""/>
+                        <h:outputLabel id="kur" value="#{satisBean.secilenTeklifBaslik.TEKLIF_KUR}" style="font-size:14px;">                            
                         </h:outputLabel>
 
                         <p:commandButton value="Revizyon No:" disabled="true" style="color: white; background-color: darkblue;font-size:14px;"/>
@@ -220,7 +219,7 @@
                                     filteredValue="#{satisBean.secilenTeklifSatir.tedarikciListesiFiltreleme}"
                                     style="font-size:12px;">
                            <p:ajax event="rowSelect" listener="#{satisBean.tedarikciSecildiDogrudanTemin}" 
-                                   update="@([id$=tedarikciOutputText])" 
+                                   update="@([id$=tedarikciOutputText]) @([id$=secilenTedarikciAciklamaOutputText])" 
                                    oncomplete="PF('tedarikci').hide();"/>
                            <p:column headerText="Tedarikçi" 
                                      filterBy="#{tedarikci.musteriKoduVeUnvani}"
@@ -234,7 +233,8 @@
                 <p:remoteCommand name="refresh" update="@([id$=tedarikciOutputText]) @([id$=tutarKolon1]) @([id$=tutarKolon2]) @([id$=tutarKolon3])
                                                         @([id$=tutarKolon4]) @([id$=tutarKolon5]) @([id$=tutarKolon6]) @([id$=tutarKolon7])
                                                         @([id$=birimFiyatOutputText]) @([id$=birimFiyatInputText]) 
-                                                        @([id$=maliyetOutputText]) @([id$=maliyetInputText])"/>
+                                                        @([id$=maliyetOutputText]) @([id$=maliyetInputText])
+                                                        @([id$=secilenTedarikciAciklamaOutputText])"/>
                   <p:dataTable 
                          rowStyleClass="#{teklifSatir.MALZEME_HIZMET_MASRAF_KODU eq 'AAA' ? 'AAA' : null}"
                          editable="true" editMode="cell"
@@ -246,7 +246,7 @@
                          rowKey="#{teklifSatir.TEKLIF_SATIR_ID}"
                          paginator="true" rows="50" 
                          paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
-                         style="font-size:12px;">                      
+                         style="font-size:11px;">                      
                     <f:facet name="header">
                         Teklif Satırları
                         <div style="float:left">
@@ -288,6 +288,9 @@
                     <p:column headerText="Açıklama" sortBy="#{teklifSatir.MALZEME_HIZMET_MASRAF_ACIKLAMASI}">
                         <h:outputText value="#{teklifSatir.MALZEME_HIZMET_MASRAF_ACIKLAMASI}" />
                     </p:column>
+                    <p:column headerText="Açıklama (Tedarikçi)" sortBy="#{teklifSatir.SECILEN_TEDARIKCI_ACIKLAMA}">
+                        <h:outputText id="secilenTedarikciAciklamaOutputText" value="#{teklifSatir.SECILEN_TEDARIKCI_ACIKLAMA}" />
+                    </p:column>
                     <p:column headerText="Tedarikçi" sortBy="#{teklifSatir.secilenTedarikciKodu}">
                         <h:outputText id="tedarikciOutputText"
                             value="#{teklifSatir.secilenTedarikciKodu}-#{teklifSatir.secilenTedarikciUnvani}" />
@@ -298,7 +301,7 @@
                             <f:setPropertyActionListener value="#{teklifSatir}" target="#{satisBean.secilenTeklifSatir}" />
                         </p:commandButton> 
                         <p:commandButton icon="fa fa-remove" 
-                                         update="@([id$=tedarikciOutputText])" 
+                                         update="@([id$=tedarikciOutputText]) @([id$=secilenTedarikciAciklamaOutputText])" 
                                          action="#{satisBean.temizleTedarikciDogrudanTemin()}">
                             <f:setPropertyActionListener value="#{teklifSatir}" target="#{satisBean.secilenTeklifSatir}" />
                         </p:commandButton>
@@ -308,8 +311,8 @@
                             <f:setPropertyActionListener value="#{teklifSatir}" target="#{satisBean.secilenTeklifSatir}" />
                         </p:commandButton>
                     </p:column>
-                    <p:column id="tedarikciKolon" headerText="Tedarikçiler" style="font-size:12px;">
-                        <p:selectCheckboxMenu id="tedarikciSelectCheckboxMenu" style="font-size:12px;" 
+                    <p:column id="tedarikciKolon" headerText="Tedarikçiler" style="font-size:11px;">
+                        <p:selectCheckboxMenu id="tedarikciSelectCheckboxMenu" style="font-size:11px;" 
                                               value="#{teklifSatir.secilenTedarikciListesi}" 
                                               label="Tedarikçiler" 
                                               multiple="true" filter="true" 
@@ -325,7 +328,7 @@
                                                value="#{teklifSatir.teminTuruTersi}" 
                                                onLabel="Tedarik" offLabel="Stok" 
                                                onIcon="fa fa-truck" offIcon="fa fa-cubes" 
-                                               style="width:100px;font-size:12px;">
+                                               style="width:100px;font-size:11px;">
                             <p:ajax update="tedarikciSelectCheckboxMenu" immediate="true"
                                     listener="#{satisBean.degistirSatirTeminTuru(teklifSatir)}"/>
                         </p:selectBooleanButton> 
@@ -389,7 +392,7 @@
                             </f:facet>
                         </p:cellEditor>                         
                     </p:column>
-                    <p:column headerText="Son Hareketler" width="110"
+                    <p:column headerText="Son Hareketler" width="130"
                               visible="#{satisBean.sessionBean.kullanici.aktifPasifTutarBoolean}">                         
                         <h:panelGrid cellpadding="1" styleClass="noBorders">
                             <p:row>
@@ -398,6 +401,11 @@
                                                    style="font-size: 11px;font-weight: bold">
                                           <f:convertNumber type="currency" currencySymbol="" locale="tr"/>
                                       </h:outputLabel>
+                                </p:column>
+                                <p:column>
+                                    <h:outputLabel id="sonSatinAlmaTeklifParaBirimi" 
+                                                   value="#{teklifSatir.sonTeklifVeSatinAlmaSatisSatiri.sonTeklifParaBirimi}"
+                                                   style="font-size: 10px"></h:outputLabel>
                                 </p:column>
                                 <p:column>
                                     <h:outputLabel id="sonSatinAlmaTeklifTarihi" value="#{teklifSatir.sonTeklifVeSatinAlmaSatisSatiri.sonSatinAlmaTeklifTarihi}" 
@@ -414,6 +422,11 @@
                                                   style="font-size: 11px;font-weight: bold">
                                         <f:convertNumber type="currency" currencySymbol="" locale="tr"/>
                                     </h:outputLabel>
+                                </p:column>
+                                <p:column>
+                                    <h:outputLabel id="sonSatinAlmaParaBirimi" 
+                                                   value="#{teklifSatir.sonTeklifVeSatinAlmaSatisSatiri.sonSatinAlmaParaBirimi}"
+                                                   style="font-size: 10px"></h:outputLabel>
                                 </p:column>
                                 <p:column>
                                     <h:outputLabel id="sonSatinAlmaTarihi" value="#{teklifSatir.sonTeklifVeSatinAlmaSatisSatiri.sonSatinAlmaTarihi}" 
@@ -464,59 +477,111 @@
                                       id="tutarKolon5" rendered="#{teklifSatir.PARA_BIRIMI==20}">
                             <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
                         </h:outputText>
-                        <h:outputText value=" "/>                    
-                        <h:outputText value="Kur: #{teklifSatir.KUR}" id="tutarKolon6"
+                        <h:outputText value=" "/>
+                        <h:outputText value="Kur:"
+                                      rendered="#{teklifSatir.PARA_BIRIMI==1 || teklifSatir.PARA_BIRIMI==20}">
+                        </h:outputText>
+                        
+                        <h:outputText value="#{teklifSatir.KUR}" id="tutarKolon6"
                                       rendered="#{teklifSatir.PARA_BIRIMI==1}">
+                            <f:convertNumber type="currency" currencySymbol="" locale="tr"/>
                         </h:outputText>
-                        <h:outputText value="Kur: #{teklifSatir.KUR}" id="tutarKolon7"
+                        <h:outputLabel value="#{teklifSatir.KUR}" id="tutarKolon7"
                                       rendered="#{teklifSatir.PARA_BIRIMI==20}">
-                        </h:outputText>
+                            <f:convertNumber type="currency" currencySymbol="" locale="tr"/>
+                        </h:outputLabel>
                     </p:column>
                     <p:rowExpansion>
-                          <p:dataTable value="#{teklifSatir.tanimliSatisFiyatiList}"
-                                       var="tanimliSatisFiyati" selectionMode="single"
-                                       rowKey="#{tanimliSatisFiyati.sanalId}"
-                                       style="width: 25%"
-                                       rendered="#{teklifSatir.tanimliSatisFiyatiList.size()>0}">
-                              <f:facet name="header">Tanımlı Satış Fiyatları</f:facet>
-                              <p:ajax event="rowSelect"  listener="#{satisBean.tanimliSatisFiyatiDegisti}" 
-                                      update=":satisTeklifDetayForm:teklifSatirlariDataTable:birimFiyatOutputText
-                                            :satisTeklifDetayForm:teklifSatirlariDataTable:birimFiyatInputText
-                                            :satisTeklifDetayForm:teklifSatirlariDataTable:maliyetOutputText
-                                            :satisTeklifDetayForm:teklifSatirlariDataTable:maliyetInputText
-                                            :satisTeklifDetayForm:teklifSatirlariDataTable:tedarikciOutputText
-                                            :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon1
-                                            :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon2
-                                            :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon3
-                                            :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon4
-                                            :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon5
-                                            :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon6
-                                            :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon7
-                                            :satisTeklifDetayForm:panelGrid"/>
-                              <p:column headerText="Fiyat">
-                                <h:outputText value="#{tanimliSatisFiyati.fiyat}"
-                                      rendered="#{teklifSatir.PARA_BIRIMI==20}"
-                                      style="font-weight: bold">
-                                    <f:convertNumber type="currency" currencySymbol="€" locale="tr"/>
-                                </h:outputText>
-                                <h:outputText value="#{tanimliSatisFiyati.fiyat}"
-                                              rendered="#{teklifSatir.PARA_BIRIMI==0}"
-                                              style="font-weight: bold">
-                                    <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
-                                </h:outputText>
-                                <h:outputText value="#{tanimliSatisFiyati.fiyat}"
-                                              rendered="#{teklifSatir.PARA_BIRIMI==1}"
-                                              style="font-weight: bold">
-                                    <f:convertNumber type="currency" currencySymbol="$" locale="tr"/>
-                                </h:outputText>  
-                              </p:column>
-                              <p:column headerText="Tanım Türü">
-                                <h:outputText value="Liste Tanımlı"
-                                              rendered="#{tanimliSatisFiyati.musteriMiListeMi==1}"/>
-                                <h:outputText value="Müşteriye Tanımlı"
-                                              rendered="#{tanimliSatisFiyati.musteriMiListeMi==0}"/>
-                              </p:column>                            
-                          </p:dataTable> 
+                        <p:tabView style="height: auto;">
+                            <p:tab title="Satış Fiyatları">
+                                <p:dataTable value="#{teklifSatir.tanimliSatisFiyatiList}"
+                                            var="tanimliSatisFiyati" selectionMode="single"
+                                            rowKey="#{tanimliSatisFiyati.sanalId}"
+                                            style="width: 25%"
+                                            rendered="#{teklifSatir.tanimliSatisFiyatiList.size()>0}">
+                                   <f:facet name="header">Tanımlı Satış Fiyatları</f:facet>
+                                   <p:ajax event="rowSelect"  listener="#{satisBean.tanimliSatisFiyatiDegisti}" 
+                                           update=":satisTeklifDetayForm:teklifSatirlariDataTable:birimFiyatOutputText
+                                                 :satisTeklifDetayForm:teklifSatirlariDataTable:birimFiyatInputText
+                                                 :satisTeklifDetayForm:teklifSatirlariDataTable:maliyetOutputText
+                                                 :satisTeklifDetayForm:teklifSatirlariDataTable:maliyetInputText
+                                                 :satisTeklifDetayForm:teklifSatirlariDataTable:tedarikciOutputText
+                                                 :satisTeklifDetayForm:teklifSatirlariDataTable:secilenTedarikciAciklamaOutputText
+                                                 :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon1
+                                                 :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon2
+                                                 :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon3
+                                                 :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon4
+                                                 :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon5
+                                                 :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon6
+                                                 :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon7
+                                                 :satisTeklifDetayForm:panelGrid"/>
+                                   <p:column headerText="Fiyat">
+                                     <h:outputText value="#{tanimliSatisFiyati.fiyat}"
+                                           rendered="#{teklifSatir.PARA_BIRIMI==20}"
+                                           style="font-weight: bold">
+                                         <f:convertNumber type="currency" currencySymbol="€" locale="tr"/>
+                                     </h:outputText>
+                                     <h:outputText value="#{tanimliSatisFiyati.fiyat}"
+                                                   rendered="#{teklifSatir.PARA_BIRIMI==0}"
+                                                   style="font-weight: bold">
+                                         <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                                     </h:outputText>
+                                     <h:outputText value="#{tanimliSatisFiyati.fiyat}"
+                                                   rendered="#{teklifSatir.PARA_BIRIMI==1}"
+                                                   style="font-weight: bold">
+                                         <f:convertNumber type="currency" currencySymbol="$" locale="tr"/>
+                                     </h:outputText>  
+                                   </p:column>
+                                   <p:column headerText="Tanım Türü">
+                                     <h:outputText value="Liste Tanımlı"
+                                                   rendered="#{tanimliSatisFiyati.musteriMiListeMi==1}"/>
+                                     <h:outputText value="Müşteriye Tanımlı"
+                                                   rendered="#{tanimliSatisFiyati.musteriMiListeMi==0}"/>
+                                   </p:column>                            
+                               </p:dataTable> 
+                            </p:tab>
+                            <p:tab title="Satın Alma Fiyatları">
+                                <p:dataTable value="#{teklifSatir.tanimliSatinAlmaFiyatiList}"
+                                            var="tanimliSatinAlmaFiyati" selectionMode="single"
+                                            rowKey="#{tanimliSatinAlmaFiyati.sanalId}"
+                                            style="width: 25%"
+                                            rendered="#{teklifSatir.tanimliSatinAlmaFiyatiList.size()>0}">
+                                   <f:facet name="header">Liste Tanımlı Satın Alma Fiyatları</f:facet>
+                                   <p:ajax event="rowSelect"  listener="#{satisBean.tanimliSatinAlmaFiyatiDegisti}" 
+                                           update=":satisTeklifDetayForm:teklifSatirlariDataTable:birimFiyatOutputText
+                                                 :satisTeklifDetayForm:teklifSatirlariDataTable:birimFiyatInputText
+                                                 :satisTeklifDetayForm:teklifSatirlariDataTable:maliyetOutputText
+                                                 :satisTeklifDetayForm:teklifSatirlariDataTable:maliyetInputText
+                                                 :satisTeklifDetayForm:teklifSatirlariDataTable:tedarikciOutputText
+                                                 :satisTeklifDetayForm:teklifSatirlariDataTable:secilenTedarikciAciklamaOutputText
+                                                 :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon1
+                                                 :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon2
+                                                 :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon3
+                                                 :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon4
+                                                 :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon5
+                                                 :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon6
+                                                 :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon7
+                                                 :satisTeklifDetayForm:panelGrid"/>
+                                   <p:column headerText="Fiyat">
+                                     <h:outputText value="#{tanimliSatinAlmaFiyati.fiyat}"
+                                           rendered="#{teklifSatir.PARA_BIRIMI==20}"
+                                           style="font-weight: bold">
+                                         <f:convertNumber type="currency" currencySymbol="€" locale="tr"/>
+                                     </h:outputText>
+                                     <h:outputText value="#{tanimliSatinAlmaFiyati.fiyat}"
+                                                   rendered="#{teklifSatir.PARA_BIRIMI==0}"
+                                                   style="font-weight: bold">
+                                         <f:convertNumber type="currency" currencySymbol="₺" locale="tr"/>
+                                     </h:outputText>
+                                     <h:outputText value="#{tanimliSatinAlmaFiyati.fiyat}"
+                                                   rendered="#{teklifSatir.PARA_BIRIMI==1}"
+                                                   style="font-weight: bold">
+                                         <f:convertNumber type="currency" currencySymbol="$" locale="tr"/>
+                                     </h:outputText>  
+                                   </p:column>                           
+                               </p:dataTable> 
+                            </p:tab>
+                        </p:tabView>
                         
                           <p:dataTable value="#{teklifSatir.satistanTedarikciKayitlariList}" 
                                        var="satistanTedarikciKayitlari" selectionMode="single"
@@ -532,6 +597,7 @@
                                             :satisTeklifDetayForm:teklifSatirlariDataTable:maliyetOutputText
                                             :satisTeklifDetayForm:teklifSatirlariDataTable:maliyetInputText
                                             :satisTeklifDetayForm:teklifSatirlariDataTable:tedarikciOutputText
+                                            :satisTeklifDetayForm:teklifSatirlariDataTable:secilenTedarikciAciklamaOutputText
                                             :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon1
                                             :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon2
                                             :satisTeklifDetayForm:teklifSatirlariDataTable:tutarKolon3
