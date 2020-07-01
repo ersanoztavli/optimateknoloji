@@ -121,7 +121,10 @@
                                     <f:facet name="output"><h:outputText value="#{kullanici.ON_DEGER_FIRMA.FIRMA_UNVANI}" /></f:facet>
                                     <f:facet name="input">
                                         <h:selectOneMenu value="#{kullanici.ON_DEGER_FIRMA.FIRMA_ID}" style="width:100%">
-                                            <f:selectItems value="#{onDegerlerBean.kullaniciFirmalari}" var="kullaniciFirmalari" itemLabel="#{kullaniciFirmalari.FIRMA_UNVANI}" itemValue="#{kullaniciFirmalari.FIRMA_ID}" />
+                                            <f:selectItems value="#{onDegerlerBean.kullaniciFirmalari}" 
+                                                           var="kullaniciFirmalari" 
+                                                           itemLabel="#{kullaniciFirmalari.FIRMA_UNVANI}" 
+                                                           itemValue="#{kullaniciFirmalari.FIRMA_ID}" />
                                         </h:selectOneMenu>
                                     </f:facet>
                                 </p:cellEditor>                

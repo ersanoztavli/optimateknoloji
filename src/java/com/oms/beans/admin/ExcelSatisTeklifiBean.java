@@ -388,7 +388,7 @@ public class ExcelSatisTeklifiBean implements Serializable{
         }
         catch (Exception ex) 
         {
-           FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Teklif kaydetme işleminde hata meydana geldi.", ""));
+           FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Teklif kaydetme işleminde hata meydana geldi." + ex.getMessage(), ""));
            return "";
         } 
     }

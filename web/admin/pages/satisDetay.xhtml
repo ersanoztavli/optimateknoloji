@@ -495,7 +495,8 @@
                         <p:tabView style="height: auto;">
                             <p:tab title="Satış Fiyatları">
                                 <p:dataTable value="#{teklifSatir.tanimliSatisFiyatiList}"
-                                            var="tanimliSatisFiyati" selectionMode="single"
+                                            var="tanimliSatisFiyati" 
+                                            selectionMode="single"
                                             rowKey="#{tanimliSatisFiyati.sanalId}"
                                             style="width: 25%"
                                             rendered="#{teklifSatir.tanimliSatisFiyatiList.size()>0}">
