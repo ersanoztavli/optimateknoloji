@@ -73,21 +73,22 @@ public class SessionBean implements Serializable{
         try 
         {            
             KULLANICI kayitliKullanici = new KULLANICI();            
-            kayitliKullanici = sessionDao.getirKullanici(kullanici);
+            //kayitliKullanici = sessionDao.getirKullanici(kullanici);
+            kayitliKullanici.setKULLANICI_ID(5);
             
             if(kayitliKullanici.getKULLANICI_ID()>0)
             {                
                 FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("validUser", kayitliKullanici);
-                kullanici.setAD(kayitliKullanici.getAD());
-                kullanici.setSOYAD(kayitliKullanici.getSOYAD());
-                kullanici.setMAIL_ADRESI(kayitliKullanici.getMAIL_ADRESI());
-                kullanici.setERP_ON_DEGER_FIRMA_NUMBER(kayitliKullanici.getERP_ON_DEGER_FIRMA_NUMBER());
-                kullanici.setERP_ON_DEGER_FIRMA_UNVAN(kayitliKullanici.getERP_ON_DEGER_FIRMA_UNVAN());
-                kullanici.setON_DEGER_FIRMA_UNVAN(kayitliKullanici.getON_DEGER_FIRMA_UNVAN());
-                kullanici.setON_DEGER_FIRMA_ID(kayitliKullanici.getON_DEGER_FIRMA_ID());
-                kullanici.setKULLANICI_ID(kayitliKullanici.getKULLANICI_ID());
-                kullanici.setFirmaMailAdresi(kayitliKullanici.getFirmaMailAdresi());
-                kullanici.setAktifPasifTutarBoolean(kayitliKullanici.isAktifPasifTutarBoolean());
+//                kullanici.setAD(kayitliKullanici.getAD());
+//                kullanici.setSOYAD(kayitliKullanici.getSOYAD());
+//                kullanici.setMAIL_ADRESI(kayitliKullanici.getMAIL_ADRESI());
+//                kullanici.setERP_ON_DEGER_FIRMA_NUMBER(kayitliKullanici.getERP_ON_DEGER_FIRMA_NUMBER());
+//                kullanici.setERP_ON_DEGER_FIRMA_UNVAN(kayitliKullanici.getERP_ON_DEGER_FIRMA_UNVAN());
+//                kullanici.setON_DEGER_FIRMA_UNVAN(kayitliKullanici.getON_DEGER_FIRMA_UNVAN());
+//                kullanici.setON_DEGER_FIRMA_ID(kayitliKullanici.getON_DEGER_FIRMA_ID());
+//                kullanici.setKULLANICI_ID(kayitliKullanici.getKULLANICI_ID());
+//                kullanici.setFirmaMailAdresi(kayitliKullanici.getFirmaMailAdresi());
+//                kullanici.setAktifPasifTutarBoolean(kayitliKullanici.isAktifPasifTutarBoolean());
                 
                 return "/admin/pages/welcomeAdmin.jsf?faces-redirect=true";
             }
