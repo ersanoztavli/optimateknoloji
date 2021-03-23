@@ -30,4 +30,4 @@ jobs:
         app-name: 'offermanagementsoftware'
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_0294749054ce40eb892e16f9c18d097e }}
-        package: '${{ github.workspace }}/dist/*.jar'
+        package: '${{ github.workspace }}/dist/*.war'
