@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy JAR app to Azure Web App - offermanagementsoftware
+name: Build and deploy WAR app to Azure Web App - offermanagementsoftware
 
 on:
   push:
@@ -29,5 +29,5 @@ jobs:
       with:
         app-name: 'offermanagementsoftware'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_0294749054ce40eb892e16f9c18d097e }}
-        package: '${{ github.workspace }}/dist/*.war'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_1c164b2930cb4659820869d721b321dd }}
+        package: '${{ github.workspace }}/target/*.war'
